@@ -9,14 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@syncfusion/ej2-react-schedule": "^26.2.10",
-    "next": "14.2.7",
+    "@syncfusion/ej2-react-buttons": "^27.1.48",
+    "@syncfusion/ej2-react-schedule": "^27.1.48",
+    "next": "14.2.13",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
