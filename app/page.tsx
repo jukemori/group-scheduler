@@ -1,5 +1,6 @@
 'use client'
 import { ButtonComponent } from '@syncfusion/ej2-react-buttons'
+import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
 import {
   Agenda,
   Day,
@@ -11,52 +12,41 @@ import {
   ViewDirective,
   ViewsDirective,
   Week,
+  Schedule,
 } from '@syncfusion/ej2-react-schedule'
 import { useEffect, useRef, useState } from 'react'
+import axios from 'axios'
 
 export default function Home() {
   const scheduleObj = useRef(null)
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const [resourceData, setResourceData] = useState([])
 
-  useEffect(() => {
-    // Fetch user details
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:3001/api/v1/users/6')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch user details')
-        }
-
-        const data = await response.json()
-        setUser(data) // Set user data to state
-
-        const eventsData = data.calendars.flatMap((calendar) =>
-          calendar.events.map((event) => ({
-            Id: event.id,
-            Subject: event.subject,
-            StartTime: new Date(event.start_time),
-            EndTime: new Date(event.end_time),
-            IsAllDay: event.is_all_day,
-            OwnerId: event.owner_id,
-          })),
-        )
-        setResourceData(eventsData)
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setLoading(false)
-      }
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await axios.post('http://127.0.0.1:3001/users/sign_in', {
+        user: {
+          email,
+          password,
+        },
+      })
+      // Handle successful login (e.g., save token, redirect, etc.)
+      console.log('Login successful:', response.data)
+    } catch (err) {
+      setError(err.response.data)
     }
+  }
 
-    fetchUser()
-  }, [])
-
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error: {error}</p>
+  const dataManager = new DataManager({
+    url: 'http://127.0.0.1:3001/api/v1/events',
+    crudUrl: 'http://127.0.0.1:3001/api/v1/events',
+    adaptor: new UrlAdaptor(),
+    crossDomain: true,
+  })
 
   const ownerData = [
     { OwnerText: 'Nancy', Id: 1, OwnerColor: '#ffaa00' },
@@ -64,7 +54,7 @@ export default function Home() {
     { OwnerText: 'Michael', Id: 3, OwnerColor: '#7499e1' },
   ]
 
-  const eventSettings = { dataSource: resourceData }
+  const eventSettings = { dataSource: dataManager }
   console.log('eventSettings', eventSettings)
 
   const onClickAdd = () => {
@@ -103,33 +93,30 @@ export default function Home() {
     scheduleObj.current.deleteEvent(62)
   }
 
-  console.log('scheduleObj', scheduleObj)
   return (
     <>
-      <div>
-        <h1>
-          {user.name} (#{user.id})
-        </h1>
-        <p>Email: {user.email}</p>
-        <p>Nickname: {user.nickname}</p>
-        <h2>Calendars</h2>
-        {user.calendars.map((calendar) => (
-          <div key={calendar.id}>
-            <h3>{calendar.name}</h3>
-            <p>{calendar.description}</p>
-            <h4>Events</h4>
-            {calendar.events.map((event) => (
-              <div key={event.id}>
-                <p>
-                  {event.subject} - {event.start_time}
-                </p>
-                <p>{event.description}</p>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-      <h2>Syncfusion React Schedule Component</h2>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Login</button>
+        {error && <p>{error}</p>}
+      </form>
       <ButtonComponent id="add" title="Add" onClick={onClickAdd}>
         Add
       </ButtonComponent>
