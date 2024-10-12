@@ -1,5 +1,4 @@
 'use client'
-import { ButtonComponent } from '@syncfusion/ej2-react-buttons'
 import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
 import {
   Agenda,
@@ -12,86 +11,65 @@ import {
   ViewDirective,
   ViewsDirective,
   Week,
-  Schedule,
 } from '@syncfusion/ej2-react-schedule'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 export default function Home() {
-  const scheduleObj = useRef(null)
-  const [resourceData, setResourceData] = useState([])
-
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://127.0.0.1:3001/users/sign_in', {
-        user: {
+      const response = await axios.post(
+        'http://127.0.0.1:3001/auth/sign_in',
+        {
           email,
           password,
         },
-      })
-      // Handle successful login (e.g., save token, redirect, etc.)
-      console.log('Login successful:', response.data)
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      )
+
+      localStorage.setItem('access-token', response.headers['access-token'])
+      localStorage.setItem('client', response.headers['client'])
+      localStorage.setItem('uid', response.headers['uid']) // Handle successful login (e.g., save token, redirect, etc.)
     } catch (err) {
-      setError(err.response.data)
+      setError((err as any).response?.data || 'An error occurred')
     }
   }
 
-  const dataManager = new DataManager({
-    url: 'http://127.0.0.1:3001/api/v1/events',
-    crudUrl: 'http://127.0.0.1:3001/api/v1/events',
-    adaptor: new UrlAdaptor(),
-    crossDomain: true,
-  })
+  const [dataManager, setDataManager] = useState<DataManager | null>(null)
+
+  useEffect(() => {
+    setDataManager(
+      new DataManager({
+        url: 'http://127.0.0.1:3001/api/v1/events',
+        crudUrl: 'http://127.0.0.1:3001/api/v1/events',
+        adaptor: new UrlAdaptor(),
+        crossDomain: true,
+        headers: [
+          { 'access-token': localStorage.getItem('access-token') || '' },
+          { client: localStorage.getItem('client') || '' },
+          { uid: localStorage.getItem('uid') || '' },
+        ],
+      }),
+    )
+  }, [])
 
   const ownerData = [
-    { OwnerText: 'Nancy', Id: 1, OwnerColor: '#ffaa00' },
-    { OwnerText: 'Steven', Id: 2, OwnerColor: '#f8a398' },
-    { OwnerText: 'Michael', Id: 3, OwnerColor: '#7499e1' },
+    { OwnerText: 'Nancy', Id: 5, OwnerColor: '#ffaa00' },
+    { OwnerText: 'Steven', Id: 6, OwnerColor: '#f8a398' },
+    { OwnerText: 'Michael', Id: 7, OwnerColor: '#7499e1' },
   ]
 
   const eventSettings = { dataSource: dataManager }
-  console.log('eventSettings', eventSettings)
-
-  const onClickAdd = () => {
-    let Data = [
-      {
-        Id: 71,
-        Subject: 'Meeting',
-        StartTime: new Date(2024, 8, 7, 9, 30),
-        EndTime: new Date(2024, 8, 7, 10, 30),
-        IsAllDay: false,
-        OwnerId: 3,
-      },
-      {
-        Id: 72,
-        Subject: 'Conference',
-        StartTime: new Date(2024, 8, 9, 13, 30),
-        EndTime: new Date(2024, 8, 9, 16, 30),
-        IsAllDay: false,
-        OwnerId: 2,
-      },
-    ]
-    scheduleObj.current.addEvent(Data)
-  }
-  const onClickSave = () => {
-    let Data = {
-      Id: 61,
-      Subject: 'Testing-edited',
-      StartTime: new Date(2018, 3, 4, 10, 30),
-      EndTime: new Date(2018, 3, 4, 11, 30),
-      IsAllDay: false,
-      OwnerId: 2,
-    }
-    scheduleObj.current.saveEvent(Data)
-  }
-  const onClickDelete = () => {
-    scheduleObj.current.deleteEvent(62)
-  }
 
   return (
     <>
@@ -117,17 +95,7 @@ export default function Home() {
         <button type="submit">Login</button>
         {error && <p>{error}</p>}
       </form>
-      <ButtonComponent id="add" title="Add" onClick={onClickAdd}>
-        Add
-      </ButtonComponent>
-      <ButtonComponent id="edit" title="Edit" onClick={onClickSave}>
-        Edit
-      </ButtonComponent>
-      <ButtonComponent id="delete" title="Delete" onClick={onClickDelete}>
-        Delete
-      </ButtonComponent>
       <ScheduleComponent
-        ref={scheduleObj}
         width="100%"
         height="550px"
         selectedDate={new Date(2024, 8, 1)}
