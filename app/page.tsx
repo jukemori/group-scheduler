@@ -13,7 +13,7 @@ export default function Login() {
     e.preventDefault()
     try {
       const response = await axios.post(
-        'http://127.0.0.1:3001/auth/sign_in',
+        'http://127.0.0.1:3001/api/v1/auth/sign_in',
         {
           email,
           password,
