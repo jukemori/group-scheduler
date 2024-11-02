@@ -49,11 +49,11 @@ export default function Dashboard() {
     )
   }
 
-  const ownerData = [
-    { OwnerText: 'Nancy', Id: 5, OwnerColor: '#ffaa00' },
-    { OwnerText: 'Steven', Id: 6, OwnerColor: '#f8a398' },
-    { OwnerText: 'Michael', Id: 7, OwnerColor: '#7499e1' },
-  ]
+  // const [ownerData] = useState([
+  //   { OwnerText: 'Nancy', Id: 1, OwnerColor: '#ffaa00' },
+  //   { OwnerText: 'Steven', Id: 2, OwnerColor: '#f8a398' },
+  //   { OwnerText: 'Michael', Id: 3, OwnerColor: '#7499e1' },
+  // ])
 
   const eventSettings = { dataSource: dataManager }
 
@@ -61,8 +61,9 @@ export default function Dashboard() {
     <ScheduleComponent
       width="100%"
       height="550px"
-      selectedDate={new Date(2024, 8, 1)}
+      selectedDate={new Date()}
       eventSettings={eventSettings}
+      currentView="Month"
     >
       <ViewsDirective>
         <ViewDirective option="Day" />
@@ -70,7 +71,7 @@ export default function Dashboard() {
         <ViewDirective option="Month" />
         <ViewDirective option="Agenda" />
       </ViewsDirective>
-      <ResourcesDirective>
+      {/* <ResourcesDirective>
         <ResourceDirective
           field="OwnerId"
           title="Owner"
@@ -81,7 +82,7 @@ export default function Dashboard() {
           idField="Id"
           colorField="OwnerColor"
         ></ResourceDirective>
-      </ResourcesDirective>
+      </ResourcesDirective> */}
       <Inject services={[Day, Week, Month, Agenda]} />
     </ScheduleComponent>
   )
