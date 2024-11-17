@@ -9,6 +9,19 @@ interface Calendar {
   description: string
 }
 
+interface CalendarInvitation {
+  id: number
+  user_id: number
+  status: string | null
+  created_at: string
+  updated_at: string
+  calendar: {
+    id: number
+    name: string
+    description: string
+  }
+}
+
 export default function Calendars() {
   const [calendars, setCalendars] = useState<Calendar[]>([])
   const [loading, setLoading] = useState(true)
@@ -16,6 +29,12 @@ export default function Calendars() {
   const [isCreating, setIsCreating] = useState(false)
   const [newCalendar, setNewCalendar] = useState({ name: '', description: '' })
   const [editingCalendar, setEditingCalendar] = useState<Calendar | null>(null)
+  const [isInviting, setIsInviting] = useState<boolean>(false)
+  const [inviteEmail, setInviteEmail] = useState<string>('')
+  const [currentCalendar, setCurrentCalendar] = useState<number | null>(null)
+  const [pendingInvitations, setPendingInvitations] = useState<
+    CalendarInvitation[]
+  >([])
   const router = useRouter()
 
   const fetchCalendars = useCallback(async () => {
@@ -47,11 +66,25 @@ export default function Calendars() {
     }
   }, [router])
 
+  const fetchPendingInvitations = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        'http://127.0.0.1:3001/api/v1/calendar_invitations',
+        { headers: getAuthHeaders() },
+      )
+      setPendingInvitations(response.data)
+    } catch (err) {
+      setError('Failed to fetch invitations')
+    }
+  }, [])
+
   useEffect(() => {
     fetchCalendars()
-  }, [fetchCalendars])
+    fetchPendingInvitations()
+  }, [fetchCalendars, fetchPendingInvitations])
 
   const handleCalendarSelect = (calendarId: number) => {
+    localStorage.setItem('calendar-id', calendarId.toString())
     router.push(`/calendars/${calendarId}`)
   }
 
@@ -118,6 +151,51 @@ export default function Calendars() {
     }
   }
 
+  const handleInvite = async (e: React.FormEvent, calendarId: number) => {
+    e.preventDefault()
+    try {
+      await axios.post(
+        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/invite`,
+        { calendar: { email: inviteEmail } },
+        { headers: getAuthHeaders() },
+      )
+      setIsInviting(false)
+      setInviteEmail('')
+      setCurrentCalendar(null)
+    } catch (err) {
+      setError('Failed to invite user')
+    }
+  }
+
+  const handleAcceptInvitation = async (calendarId: number) => {
+    try {
+      await axios.post(
+        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/accept_invitation`,
+        {},
+        { headers: getAuthHeaders() },
+      )
+      // Refresh invitations and calendars
+      fetchPendingInvitations()
+      fetchCalendars()
+    } catch (err) {
+      setError('Failed to accept invitation')
+    }
+  }
+
+  const handleRejectInvitation = async (calendarId: number) => {
+    try {
+      await axios.post(
+        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/reject_invitation`,
+        {},
+        { headers: getAuthHeaders() },
+      )
+      // Refresh invitations
+      fetchPendingInvitations()
+    } catch (err) {
+      setError('Failed to reject invitation')
+    }
+  }
+
   if (loading) return <div>Loading calendars...</div>
   if (error) return <div>Error: {error}</div>
   if (calendars.length === 0) return <div>No calendars available</div>
@@ -170,6 +248,83 @@ export default function Calendars() {
             </button>
           </div>
         </form>
+      )}
+
+      {isInviting && (
+        <form
+          onSubmit={(e) => handleInvite(e, currentCalendar!)}
+          className="mb-4 space-y-2"
+        >
+          <input
+            type="email"
+            placeholder="Enter email to invite"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            className="block w-full p-2 border rounded"
+            required
+          />
+          <div className="space-x-2">
+            <button
+              type="submit"
+              className="bg-purple-500 text-white px-4 py-2 rounded"
+            >
+              Send Invite
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsInviting(false)
+                setInviteEmail('')
+                setCurrentCalendar(null)
+              }}
+              className="bg-gray-500 text-white px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+
+      {pendingInvitations.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">Pending Invitations</h2>
+          <ul className="space-y-4">
+            {pendingInvitations.map((invitation) => (
+              <li key={invitation.id} className="border p-4 rounded bg-gray-50">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold">
+                      {invitation.calendar.name}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Status: {invitation.status || 'pending'}
+                    </p>
+                  </div>
+                  {(!invitation.status || invitation.status === 'pending') && (
+                    <div className="space-x-2">
+                      <button
+                        onClick={() =>
+                          handleAcceptInvitation(invitation.calendar.id)
+                        }
+                        className="bg-green-500 text-white px-4 py-2 rounded"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleRejectInvitation(invitation.calendar.id)
+                        }
+                        className="bg-red-500 text-white px-4 py-2 rounded"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <ul className="space-y-4">
@@ -240,6 +395,15 @@ export default function Calendars() {
                     className="bg-red-500 text-white px-4 py-2 rounded"
                   >
                     Delete
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsInviting(true)
+                      setCurrentCalendar(calendar.id)
+                    }}
+                    className="bg-purple-500 text-white px-4 py-2 rounded"
+                  >
+                    Invite
                   </button>
                 </div>
               </div>
