@@ -1,4 +1,5 @@
 'use client'
+import CalendarNotes from '@/app/components/CalendarNotes'
 import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
 import {
   Agenda,
@@ -74,32 +75,35 @@ export default function Dashboard() {
   const eventSettings: EventSettingsModel = { dataSource: dataManager }
 
   return (
-    <ScheduleComponent
-      width="100%"
-      height="550px"
-      selectedDate={new Date()}
-      eventSettings={eventSettings}
-      currentView="Month"
-    >
-      <ViewsDirective>
-        <ViewDirective option="Day" />
-        <ViewDirective option="Week" />
-        <ViewDirective option="Month" />
-        <ViewDirective option="Agenda" />
-      </ViewsDirective>
-      <ResourcesDirective>
-        <ResourceDirective
-          field="OwnerId"
-          title="Owner"
-          name="Owners"
-          allowMultiple={true}
-          dataSource={ownerData}
-          textField="OwnerText"
-          idField="Id"
-          colorField="OwnerColor"
-        ></ResourceDirective>
-      </ResourcesDirective>
-      <Inject services={[Day, Week, Month, Agenda]} />
-    </ScheduleComponent>
+    <>
+      <ScheduleComponent
+        width="100%"
+        height="550px"
+        selectedDate={new Date()}
+        eventSettings={eventSettings}
+        currentView="Month"
+      >
+        <ViewsDirective>
+          <ViewDirective option="Day" />
+          <ViewDirective option="Week" />
+          <ViewDirective option="Month" />
+          <ViewDirective option="Agenda" />
+        </ViewsDirective>
+        <ResourcesDirective>
+          <ResourceDirective
+            field="OwnerId"
+            title="Owner"
+            name="Owners"
+            allowMultiple={true}
+            dataSource={ownerData}
+            textField="OwnerText"
+            idField="Id"
+            colorField="OwnerColor"
+          ></ResourceDirective>
+        </ResourcesDirective>
+        <Inject services={[Day, Week, Month, Agenda]} />
+      </ScheduleComponent>
+      <CalendarNotes calendarId={params.id as string} />
+    </>
   )
 }
