@@ -10,13 +10,15 @@ import {
   ScheduleComponent,
   ViewDirective,
   ViewsDirective,
+  EventSettingsModel,
   Week,
 } from '@syncfusion/ej2-react-schedule'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 
 export default function Dashboard() {
-  const [dataManager, setDataManager] = useState<DataManager | null>(null)
+  const [dataManager, setDataManager] = useState<DataManager>()
+  const [ownerData, setOwnerData] = useState([])
   const router = useRouter()
   const params = useParams()
 
@@ -25,10 +27,30 @@ export default function Dashboard() {
     const client = localStorage.getItem('client')
     const uid = localStorage.getItem('uid')
 
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:3001/api/v1/calendars/${params.id}/users`,
+          {
+            headers: {
+              'access-token': localStorage.getItem('access-token') || '',
+              client: localStorage.getItem('client') || '',
+              uid: localStorage.getItem('uid') || '',
+            },
+          },
+        )
+        const data = await response.json()
+        setOwnerData(data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+
     if (!(accessToken && client && uid)) {
       router.push('/')
     } else {
       initializeDataManager()
+      fetchUsers()
     }
   }, [router, params.id])
 
@@ -49,13 +71,7 @@ export default function Dashboard() {
     )
   }
 
-  // const [ownerData] = useState([
-  //   { OwnerText: 'Nancy', Id: 1, OwnerColor: '#ffaa00' },
-  //   { OwnerText: 'Steven', Id: 2, OwnerColor: '#f8a398' },
-  //   { OwnerText: 'Michael', Id: 3, OwnerColor: '#7499e1' },
-  // ])
-
-  const eventSettings = { dataSource: dataManager }
+  const eventSettings: EventSettingsModel = { dataSource: dataManager }
 
   return (
     <ScheduleComponent
@@ -71,7 +87,7 @@ export default function Dashboard() {
         <ViewDirective option="Month" />
         <ViewDirective option="Agenda" />
       </ViewsDirective>
-      {/* <ResourcesDirective>
+      <ResourcesDirective>
         <ResourceDirective
           field="OwnerId"
           title="Owner"
@@ -82,7 +98,7 @@ export default function Dashboard() {
           idField="Id"
           colorField="OwnerColor"
         ></ResourceDirective>
-      </ResourcesDirective> */}
+      </ResourcesDirective>
       <Inject services={[Day, Week, Month, Agenda]} />
     </ScheduleComponent>
   )
