@@ -1,5 +1,4 @@
 'use client'
-import CalendarNotes from '@/components/CalendarNotes'
 import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
 import {
   Agenda,
@@ -103,7 +102,6 @@ export default function Dashboard() {
         </ResourcesDirective>
         <Inject services={[Day, Week, Month, Agenda]} />
       </ScheduleComponent>
-      <CalendarNotes calendarId={params.id as string} />
     </>
   )
 }
