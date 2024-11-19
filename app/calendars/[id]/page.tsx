@@ -1,5 +1,5 @@
 'use client'
-import CalendarNotes from '@/app/components/CalendarNotes'
+import CalendarNotes from '@/components/CalendarNotes'
 import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
 import {
   Agenda,
