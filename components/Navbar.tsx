@@ -28,8 +28,8 @@ export default function Navbar({ calendarId }: NavProps) {
     },
     {
       icon: Users,
-      href: `/calendars/${calendarId}/invitations`,
-      isActive: pathname === `/calendars/${calendarId}/invitations`,
+      href: `/calendars/${calendarId}/members`,
+      isActive: pathname === `/calendars/${calendarId}/members`,
     },
   ]
 
