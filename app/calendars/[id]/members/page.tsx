@@ -1,19 +1,15 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import axios from 'axios'
 
-export default function InvitationsPage() {
+export default function MembersPage() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [members, setMembers] = useState([])
   const params = useParams()
   const calendarId = params.id as string
-
-  useEffect(() => {
-    fetchMembers()
-  }, [calendarId])
 
   const getAuthHeaders = () => {
     return {
@@ -23,7 +19,7 @@ export default function InvitationsPage() {
     }
   }
 
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       const response = await fetch(
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/users`,
@@ -36,7 +32,11 @@ export default function InvitationsPage() {
     } catch (error) {
       console.error('Error fetching members:', error)
     }
-  }
+  }, [calendarId])
+
+  useEffect(() => {
+    fetchMembers()
+  }, [fetchMembers])
 
   const handleInvite = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
