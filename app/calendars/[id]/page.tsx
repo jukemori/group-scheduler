@@ -46,30 +46,33 @@ export default function Dashboard() {
       }
     }
 
+    const initializeDataManager = () => {
+      console.log('initializeDataManager called')
+      setDataManager(
+        new DataManager({
+          url: 'http://127.0.0.1:3001/api/v1/events',
+          crudUrl: 'http://127.0.0.1:3001/api/v1/events',
+          adaptor: new UrlAdaptor(),
+          crossDomain: true,
+          headers: [
+            { 'access-token': localStorage.getItem('access-token') || '' },
+            { client: localStorage.getItem('client') || '' },
+            { uid: localStorage.getItem('uid') || '' },
+            { 'calendar-id': localStorage.getItem('calendar-id') || '' },
+          ],
+        }),
+      )
+    }
+
     if (!(accessToken && client && uid)) {
       router.push('/')
     } else {
-      initializeDataManager()
       fetchUsers()
+      setTimeout(() => {
+        initializeDataManager()
+      }, 100)
     }
   }, [router, params.id])
-
-  const initializeDataManager = () => {
-    setDataManager(
-      new DataManager({
-        url: 'http://127.0.0.1:3001/api/v1/events',
-        crudUrl: 'http://127.0.0.1:3001/api/v1/events',
-        adaptor: new UrlAdaptor(),
-        crossDomain: true,
-        headers: [
-          { 'access-token': localStorage.getItem('access-token') || '' },
-          { client: localStorage.getItem('client') || '' },
-          { uid: localStorage.getItem('uid') || '' },
-          { 'calendar-id': localStorage.getItem('calendar-id') || '' },
-        ],
-      }),
-    )
-  }
 
   const eventSettings: EventSettingsModel = { dataSource: dataManager }
 
