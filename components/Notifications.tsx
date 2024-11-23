@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { webSocketService } from '@/utils/websocket'
 import toast from 'react-hot-toast'
 
@@ -20,6 +20,7 @@ interface Notification {
 export default function Notifications({ calendarId }: { calendarId: string }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isConnected, setIsConnected] = useState(false)
+  const notificationsRef = useRef<Notification[]>([])
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -36,37 +37,34 @@ export default function Notifications({ calendarId }: { calendarId: string }) {
         )
         const data = await response.json()
         setNotifications(Array.isArray(data) ? data : [])
+        notificationsRef.current = Array.isArray(data) ? data : []
       } catch (error) {
         console.error('Error fetching notifications:', error)
         setNotifications([])
+        notificationsRef.current = []
       }
     }
 
-    fetchNotifications()
-
-    // Connect to WebSocket
-    webSocketService.connect(calendarId)
-
-    // Handle connection status
     const handleConnectionStatus = (status: boolean) => {
-      console.log('WebSocket connection status:', status)
       setIsConnected(status)
     }
 
-    // Handle new notifications
     const handleNotification = (notification: Notification) => {
-      console.log('New notification received:', notification)
-
-      // Ensure the notification has a created_at field
       const processedNotification = {
         ...notification,
         created_at: notification.created_at || new Date().toISOString(),
       }
 
-      setNotifications((prev) => {
-        const exists = prev.some((n) => n.id === processedNotification.id)
-        if (exists) return prev
-        return [processedNotification, ...prev]
+      setNotifications((prevNotifications) => {
+        if (!prevNotifications.some((n) => n.id === processedNotification.id)) {
+          const updatedNotifications = [
+            processedNotification,
+            ...prevNotifications,
+          ]
+          notificationsRef.current = updatedNotifications
+          return updatedNotifications
+        }
+        return prevNotifications
       })
 
       toast.success(notification.message)
@@ -75,10 +73,13 @@ export default function Notifications({ calendarId }: { calendarId: string }) {
     webSocketService.onConnectionStatus(handleConnectionStatus)
     webSocketService.onNotification(handleNotification)
 
+    fetchNotifications()
+    webSocketService.connect(calendarId)
+
     return () => {
-      webSocketService.disconnect()
       webSocketService.removeNotificationCallback(handleNotification)
       webSocketService.removeConnectionStatusCallback(handleConnectionStatus)
+      webSocketService.disconnect()
     }
   }, [calendarId])
 

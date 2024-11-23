@@ -28,15 +28,17 @@ export class WebSocketService {
         this.reconnectAttempts = 0
         this.notifyConnectionStatus(true)
 
-        this.socket?.send(
-          JSON.stringify({
-            command: 'subscribe',
-            identifier: JSON.stringify({
-              channel: 'CalendarChannel',
-              calendar_id: calendarId,
+        setTimeout(() => {
+          this.socket?.send(
+            JSON.stringify({
+              command: 'subscribe',
+              identifier: JSON.stringify({
+                channel: 'CalendarChannel',
+                calendar_id: calendarId,
+              }),
             }),
-          }),
-        )
+          )
+        }, 100)
       }
 
       this.socket.onclose = (event) => {
@@ -65,10 +67,6 @@ export class WebSocketService {
             this.processedActionIds.has(data.message.action_id)
           ) {
             return
-          }
-
-          if (data.message?.action_id) {
-            this.processedActionIds.add(data.message.action_id)
           }
 
           if (data.message && data.message.notification) {
@@ -112,12 +110,14 @@ export class WebSocketService {
       this.socket.close()
       this.socket = null
     }
-    this.notificationCallbacks = []
-    this.connectionStatusCallbacks = []
     this.processedActionIds.clear()
   }
 
   onNotification(callback: NotificationCallback) {
+    if (typeof callback !== 'function') {
+      console.error('Invalid notification callback provided:', callback)
+      return
+    }
     this.notificationCallbacks.push(callback)
   }
 
@@ -128,10 +128,20 @@ export class WebSocketService {
   }
 
   notifyConnectionStatus(status: boolean) {
-    this.connectionStatusCallbacks.forEach((callback) => callback(status))
+    this.connectionStatusCallbacks.forEach((callback) => {
+      try {
+        callback(status)
+      } catch (error) {
+        console.error('Error in connection status callback:', error)
+      }
+    })
   }
 
   onConnectionStatus(callback: (status: boolean) => void) {
+    if (typeof callback !== 'function') {
+      console.error('Invalid connection status callback provided:', callback)
+      return
+    }
     this.connectionStatusCallbacks.push(callback)
   }
 
