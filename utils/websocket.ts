@@ -14,76 +14,78 @@ export class WebSocketService {
       this.disconnect()
     }
 
-    try {
-      const accessToken = encodeURIComponent(
-        localStorage.getItem('access-token') || '',
-      )
-      const client = encodeURIComponent(localStorage.getItem('client') || '')
-      const uid = encodeURIComponent(localStorage.getItem('uid') || '')
+    setTimeout(() => {
+      try {
+        const accessToken = encodeURIComponent(
+          localStorage.getItem('access-token') || '',
+        )
+        const client = encodeURIComponent(localStorage.getItem('client') || '')
+        const uid = encodeURIComponent(localStorage.getItem('uid') || '')
 
-      const wsUrl = `ws://localhost:3001/cable?access-token=${accessToken}&client=${client}&uid=${uid}`
-      this.socket = new WebSocket(wsUrl)
+        const wsUrl = `ws://localhost:3001/cable?access-token=${accessToken}&client=${client}&uid=${uid}`
+        this.socket = new WebSocket(wsUrl)
 
-      this.socket.onopen = () => {
-        this.reconnectAttempts = 0
-        this.notifyConnectionStatus(true)
+        this.socket.onopen = () => {
+          this.reconnectAttempts = 0
+          this.notifyConnectionStatus(true)
 
-        setTimeout(() => {
-          this.socket?.send(
-            JSON.stringify({
-              command: 'subscribe',
-              identifier: JSON.stringify({
-                channel: 'CalendarChannel',
+          setTimeout(() => {
+            this.socket?.send(
+              JSON.stringify({
+                command: 'subscribe',
+                identifier: JSON.stringify({
+                  channel: 'CalendarChannel',
+                }),
               }),
-            }),
-          )
-        }, 100)
-      }
-
-      this.socket.onclose = (event) => {
-        this.notifyConnectionStatus(false)
-        this.attemptReconnect()
-      }
-
-      this.socket.onerror = (error) => {
-        console.error('WebSocket error:', error)
-      }
-
-      this.socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-
-          if (
-            data.type === 'ping' ||
-            data.type === 'welcome' ||
-            data.type === 'confirm_subscription'
-          ) {
-            return
-          }
-
-          if (
-            data.message?.action_id &&
-            this.processedActionIds.has(data.message.action_id)
-          ) {
-            return
-          }
-
-          if (data.message && data.message.notification) {
-            this.notificationCallbacks.forEach((callback) => {
-              try {
-                callback(data.message.notification)
-              } catch (error) {
-                console.error('Error in notification callback:', error)
-              }
-            })
-          }
-        } catch (error) {
-          console.error('Error handling WebSocket message:', error)
+            )
+          }, 100)
         }
+
+        this.socket.onclose = (event) => {
+          this.notifyConnectionStatus(false)
+          this.attemptReconnect()
+        }
+
+        this.socket.onerror = (error) => {
+          console.error('WebSocket error:', error)
+        }
+
+        this.socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+
+            if (
+              data.type === 'ping' ||
+              data.type === 'welcome' ||
+              data.type === 'confirm_subscription'
+            ) {
+              return
+            }
+
+            if (
+              data.message?.action_id &&
+              this.processedActionIds.has(data.message.action_id)
+            ) {
+              return
+            }
+
+            if (data.message && data.message.notification) {
+              this.notificationCallbacks.forEach((callback) => {
+                try {
+                  callback(data.message.notification)
+                } catch (error) {
+                  console.error('Error in notification callback:', error)
+                }
+              })
+            }
+          } catch (error) {
+            console.error('Error handling WebSocket message:', error)
+          }
+        }
+      } catch (error) {
+        console.error('Error creating WebSocket connection:', error)
       }
-    } catch (error) {
-      console.error('Error creating WebSocket connection:', error)
-    }
+    }, 100)
   }
 
   private attemptReconnect() {
