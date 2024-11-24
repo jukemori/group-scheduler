@@ -10,6 +10,7 @@ interface Notification {
   user: {
     id: number
     nickname: string
+    calendar_id: string
   }
   event?: {
     id: number
@@ -74,7 +75,7 @@ export default function Notifications({ calendarId }: { calendarId: string }) {
     webSocketService.onNotification(handleNotification)
 
     fetchNotifications()
-    webSocketService.connect(calendarId)
+    webSocketService.connect()
 
     return () => {
       webSocketService.removeNotificationCallback(handleNotification)

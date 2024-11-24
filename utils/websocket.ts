@@ -9,7 +9,7 @@ export class WebSocketService {
   private reconnectTimeout: NodeJS.Timeout | null = null
   private processedActionIds = new Set<string>()
 
-  connect(calendarId: string) {
+  connect() {
     if (this.socket) {
       this.disconnect()
     }
@@ -34,7 +34,6 @@ export class WebSocketService {
               command: 'subscribe',
               identifier: JSON.stringify({
                 channel: 'CalendarChannel',
-                calendar_id: calendarId,
               }),
             }),
           )
@@ -43,7 +42,7 @@ export class WebSocketService {
 
       this.socket.onclose = (event) => {
         this.notifyConnectionStatus(false)
-        this.attemptReconnect(calendarId)
+        this.attemptReconnect()
       }
 
       this.socket.onerror = (error) => {
@@ -87,7 +86,7 @@ export class WebSocketService {
     }
   }
 
-  private attemptReconnect(calendarId: string) {
+  private attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       return
     }
@@ -98,7 +97,7 @@ export class WebSocketService {
 
     this.reconnectTimeout = setTimeout(() => {
       this.reconnectAttempts++
-      this.connect(calendarId)
+      this.connect()
     }, 3000)
   }
 
