@@ -1,13 +1,47 @@
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Bell, CirclePlus, Home, NotepadText, Users } from 'lucide-react'
+import { useSchedule } from '@/contexts/ScheduleContext'
+import { useEffect } from 'react'
 
 interface NavProps {
   calendarId: string
 }
 
 export default function Navbar({ calendarId }: NavProps) {
+  const router = useRouter()
   const pathname = usePathname()
+  const { scheduleRef } = useSchedule()
+  const isDashboardPage = pathname === `/calendars/${calendarId}`
+
+  const eventButton = () => {
+    if (!isDashboardPage) {
+      sessionStorage.setItem('openEventEditor', 'true')
+      router.push(`/calendars/${calendarId}`)
+      return
+    }
+
+    let cellData = {
+      startTime: new Date(),
+      endTime: new Date(new Date().getTime() + 30 * 60000),
+      subject: 'New Event',
+    }
+    scheduleRef?.current?.openEditor(cellData, 'Add')
+  }
+
+  useEffect(() => {
+    if (isDashboardPage && sessionStorage.getItem('openEventEditor')) {
+      sessionStorage.removeItem('openEventEditor')
+      let cellData = {
+        startTime: new Date(),
+        endTime: new Date(new Date().getTime() + 30 * 60000),
+        subject: 'New Event',
+      }
+      setTimeout(() => {
+        scheduleRef?.current?.openEditor(cellData, 'Add')
+      }, 100)
+    }
+  }, [isDashboardPage, scheduleRef])
 
   const navItems = [
     {
@@ -20,7 +54,11 @@ export default function Navbar({ calendarId }: NavProps) {
       href: `/calendars/${calendarId}/notifications`,
       isActive: pathname === `/calendars/${calendarId}/notifications`,
     },
-    { icon: CirclePlus, href: '#', isActive: false },
+    {
+      icon: CirclePlus,
+      href: '#',
+      eventCreate: eventButton,
+    },
     {
       icon: NotepadText,
       href: `/calendars/${calendarId}/notes`,
@@ -142,19 +180,33 @@ export default function Navbar({ calendarId }: NavProps) {
           id="navbar-user"
         >
           <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 ">
-            {navItems.map(({ icon: Icon, href, isActive }) => (
+            {navItems.map(({ icon: Icon, href, isActive, eventCreate }) => (
               <li key={`${Icon.name}-${href}`}>
-                <Link
-                  href={href}
-                  className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0  ${
-                    isActive
-                      ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
-                      : 'text-white'
-                  }`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <Icon />
-                </Link>
+                {eventCreate ? (
+                  <button
+                    id="btn1"
+                    onClick={eventCreate}
+                    className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${
+                      isActive
+                        ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
+                        : 'text-white'
+                    }`}
+                  >
+                    <Icon />
+                  </button>
+                ) : (
+                  <Link
+                    href={href}
+                    className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0  ${
+                      isActive
+                        ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
+                        : 'text-white'
+                    }`}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    <Icon />
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
