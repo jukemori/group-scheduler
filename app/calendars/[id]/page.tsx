@@ -15,8 +15,6 @@ import {
 } from '@syncfusion/ej2-react-schedule'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import Notifications from '@/components/Notifications'
-import { Toaster } from 'react-hot-toast'
 export default function Dashboard() {
   const [dataManager, setDataManager] = useState<DataManager>()
   const [ownerData, setOwnerData] = useState([])
@@ -48,7 +46,6 @@ export default function Dashboard() {
     }
 
     const initializeDataManager = () => {
-      console.log('initializeDataManager called')
       setDataManager(
         new DataManager({
           url: 'http://127.0.0.1:3001/api/v1/events',
@@ -79,8 +76,6 @@ export default function Dashboard() {
 
   return (
     <>
-      <Toaster position="top-right" />
-      <Notifications calendarId={params.id.toString()} />
       <ScheduleComponent
         width="100%"
         height="550px"

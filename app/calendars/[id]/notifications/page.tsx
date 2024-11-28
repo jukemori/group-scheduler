@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import axios from 'axios'
+import Notifications from '@/components/Notifications'
+import { Toaster } from 'react-hot-toast'
 
 interface CalendarInvitation {
   id: number
@@ -80,11 +82,13 @@ export default function NotificationsPage() {
 
   if (loading) return <div>Loading notifications...</div>
   if (error) return <div>Error: {error}</div>
-  if (pendingInvitations.length === 0) return <div>No pending invitations</div>
+  // if (pendingInvitations.length === 0) return <div>No pending invitations</div>
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Notifications</h1>
+      <Toaster position="top-right" />
+      <Notifications />
       <ul className="space-y-4">
         {pendingInvitations.map((invitation) => (
           <li key={invitation.id} className="border p-4 rounded bg-gray-50">
