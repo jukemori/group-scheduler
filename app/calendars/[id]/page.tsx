@@ -15,11 +15,13 @@ import {
 } from '@syncfusion/ej2-react-schedule'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useSchedule } from '@/contexts/ScheduleContext'
 export default function Dashboard() {
   const [dataManager, setDataManager] = useState<DataManager>()
   const [ownerData, setOwnerData] = useState([])
   const router = useRouter()
   const params = useParams()
+  const { scheduleRef } = useSchedule()
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access-token')
@@ -77,6 +79,7 @@ export default function Dashboard() {
   return (
     <>
       <ScheduleComponent
+        ref={scheduleRef}
         width="100%"
         height="550px"
         selectedDate={new Date()}
