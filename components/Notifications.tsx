@@ -18,7 +18,7 @@ interface Notification {
   }
 }
 
-export default function Notifications({ calendarId }: { calendarId: string }) {
+export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const notificationsRef = useRef<Notification[]>([])
@@ -27,7 +27,7 @@ export default function Notifications({ calendarId }: { calendarId: string }) {
     const fetchNotifications = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/v1/calendars/${calendarId}/notifications`,
+          `http://localhost:3001/api/v1/users/notifications`,
           {
             headers: {
               'access-token': localStorage.getItem('access-token') || '',
@@ -82,7 +82,7 @@ export default function Notifications({ calendarId }: { calendarId: string }) {
       webSocketService.removeConnectionStatusCallback(handleConnectionStatus)
       webSocketService.disconnect()
     }
-  }, [calendarId])
+  }, [])
 
   const formatDate = (dateString: string | Date) => {
     try {
