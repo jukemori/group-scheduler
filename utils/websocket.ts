@@ -29,8 +29,8 @@ export class WebSocketService {
           this.reconnectAttempts = 0
           this.notifyConnectionStatus(true)
 
-          setTimeout(() => {
-            this.socket?.send(
+          if (this.socket?.readyState === WebSocket.OPEN) {
+            this.socket.send(
               JSON.stringify({
                 command: 'subscribe',
                 identifier: JSON.stringify({
@@ -38,7 +38,7 @@ export class WebSocketService {
                 }),
               }),
             )
-          }, 100)
+          }
         }
 
         this.socket.onclose = (event) => {
