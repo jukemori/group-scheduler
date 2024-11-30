@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react'
-
+import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 
-export function NavUser() {
+export function NavUser({ calendarId }: { calendarId: string }) {
   const { user, loading } = useCurrentUser()
 
   if (loading) {
@@ -63,10 +63,12 @@ export function NavUser() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Settings />
-            Settings
-          </DropdownMenuItem>
+          <Link href={`/calendars/${calendarId}/settings`}>
+            <DropdownMenuItem>
+              <Settings />
+              Settings
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>

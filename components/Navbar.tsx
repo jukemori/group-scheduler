@@ -91,7 +91,7 @@ export default function Navbar({ calendarId }: NavProps) {
           </span>
         </a>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <NavUser />
+          <NavUser calendarId={calendarId} />
         </div>
         <div
           className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
