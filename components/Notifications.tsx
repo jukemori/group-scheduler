@@ -94,7 +94,22 @@ export default function Notifications() {
         return 'Invalid date'
       }
 
-      return date.toLocaleString()
+      const now = new Date()
+      const diffInMilliseconds = now.getTime() - date.getTime()
+      const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60))
+      const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60))
+      const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24))
+      const diffInWeeks = Math.floor(diffInDays / 7)
+
+      if (diffInMinutes < 60) {
+        return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`
+      } else if (diffInHours < 24) {
+        return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`
+      } else if (diffInDays < 7) {
+        return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`
+      } else {
+        return `${diffInWeeks} week${diffInWeeks !== 1 ? 's' : ''} ago`
+      }
     } catch (error) {
       console.error('Error formatting date:', error)
       return 'Invalid date'
