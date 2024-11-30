@@ -20,6 +20,19 @@ export const userApi = {
     const response = await api.get('/api/v1/users/notifications')
     return response.data
   },
+
+  logout: async () => {
+    try {
+      await api.get('/api/v1/auth/sign_out')
+      localStorage.removeItem('access-token')
+      localStorage.removeItem('client')
+      localStorage.removeItem('uid')
+      window.location.href = '/'
+    } catch (error) {
+      console.error('Error during logout:', error)
+      throw error
+    }
+  },
 }
 
 // Add a custom hook for getting the current user

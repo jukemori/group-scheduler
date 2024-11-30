@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { userApi } from '@/lib/api/users'
 
 export function NavUser({ calendarId }: { calendarId: string }) {
   const { user, loading } = useCurrentUser()
@@ -23,6 +24,14 @@ export function NavUser({ calendarId }: { calendarId: string }) {
         <AvatarFallback className="rounded-lg">...</AvatarFallback>
       </Avatar>
     )
+  }
+
+  const handleLogout = async () => {
+    try {
+      await userApi.logout()
+    } catch (error) {
+      console.error('Failed to logout:', error)
+    }
   }
 
   return (
@@ -71,7 +80,7 @@ export function NavUser({ calendarId }: { calendarId: string }) {
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOut />
           Log out
         </DropdownMenuItem>
