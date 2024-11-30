@@ -11,6 +11,11 @@ export default function EditUserPage() {
     email: '',
     color: '',
   })
+  const [passwords, setPasswords] = useState({
+    current_password: '',
+    password: '',
+    password_confirmation: '',
+  })
   const [photo, setPhoto] = useState<File | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -43,12 +48,23 @@ export default function EditUserPage() {
         }
       })
 
+      if (passwords.current_password) {
+        Object.entries(passwords).forEach(([key, value]) => {
+          formData.append(`user[${key}]`, value)
+        })
+      }
+
       if (photo) {
         formData.append('user[photo]', photo)
       }
 
       await userApi.updateUser(formData)
       setSuccess('User updated successfully')
+      setPasswords({
+        current_password: '',
+        password: '',
+        password_confirmation: '',
+      })
     } catch (err) {
       setError('Failed to update user')
     } finally {
@@ -106,6 +122,53 @@ export default function EditUserPage() {
             value={user.email}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
             className="w-full p-2 border rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2">Current Password</label>
+          <input
+            type="password"
+            value={passwords.current_password}
+            onChange={(e) =>
+              setPasswords({
+                ...passwords,
+                current_password: e.target.value,
+              })
+            }
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2">New Password</label>
+          <input
+            type="password"
+            value={passwords.password}
+            onChange={(e) =>
+              setPasswords({
+                ...passwords,
+                password: e.target.value,
+              })
+            }
+            className="w-full p-2 border rounded"
+            minLength={6}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2">Confirm New Password</label>
+          <input
+            type="password"
+            value={passwords.password_confirmation}
+            onChange={(e) =>
+              setPasswords({
+                ...passwords,
+                password_confirmation: e.target.value,
+              })
+            }
+            className="w-full p-2 border rounded"
+            minLength={6}
           />
         </div>
 
