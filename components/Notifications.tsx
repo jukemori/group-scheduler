@@ -2,11 +2,14 @@
 import { useEffect, useState, useRef } from 'react'
 import { webSocketService } from '@/utils/websocket'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 interface Notification {
   id: number
   message: string
   created_at: string | Date
+  notification_type: string
+  calendar_id: string
   user: {
     id: number
     nickname: string
@@ -127,15 +130,33 @@ export default function Notifications() {
         <div className="no-notifications">No notifications</div>
       ) : (
         <div className="notifications-list">
-          {notifications.map((notification) => (
-            <div
-              key={`${notification.id}-${notification.created_at}`}
-              className="notification-item"
-            >
-              <p>{notification.message}</p>
-              <small>{formatDate(notification.created_at)}</small>
-            </div>
-          ))}
+          {notifications.map((notification) => {
+            const calendarId = notification.calendar_id
+            let href = ''
+
+            switch (notification.notification_type) {
+              case 'event':
+                href = `/calendars/${calendarId}`
+                break
+              case 'note':
+                href = `/calendars/${calendarId}/notes`
+                break
+              case 'invitation_accepted':
+                href = `/calendars/${calendarId}/members`
+                break
+            }
+
+            return (
+              <Link
+                key={`${notification.id}-${notification.created_at}`}
+                href={href}
+                className="notification-item"
+              >
+                <p>{notification.message}</p>
+                <small>{formatDate(notification.created_at)}</small>
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>
