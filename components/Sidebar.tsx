@@ -63,7 +63,9 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               key={calendar.id}
               onClick={() => handleCalendarSelect(calendar.id)}
               className={`block p-2 rounded cursor-pointer hover:bg-gray-200 ${
-                pathname === `/calendars/${calendar.id}` ? 'bg-gray-200' : ''
+                pathname.startsWith(`/calendars/${calendar.id}`)
+                  ? 'bg-gray-200'
+                  : ''
               }`}
             >
               {calendar.name}
