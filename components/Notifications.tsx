@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import { webSocketService } from '@/utils/websocket'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface Notification {
   id: number
@@ -18,6 +19,7 @@ interface Notification {
     id: number
     nickname: string
     calendar_id: string
+    photo_url: string
   }
   event?: {
     id: number
@@ -206,33 +208,49 @@ export default function Notifications() {
             return (
               <div
                 key={`${notification.id}-${notification.created_at}`}
-                className="notification-item"
+                className="notification-item p-4 mb-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100"
               >
-                {notification.notification_type === 'invitation_sent' ? (
-                  <div>
-                    <p>{notification.message}</p>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={() => handleAcceptInvitation(calendarId)}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-sm"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => handleRejectInvitation(calendarId)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                    <small>{formatDate(notification.created_at)}</small>
+                <div className="flex items-start gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={notification.user.photo_url} />
+                    <AvatarFallback>
+                      {notification.user.nickname.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1">
+                    {notification.notification_type === 'invitation_sent' ? (
+                      <div>
+                        <p className="text-sm text-gray-800 font-medium">
+                          {notification.message}
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handleAcceptInvitation(calendarId)}
+                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => handleRejectInvitation(calendarId)}
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Link href={href} className="block">
+                        <p className="text-sm text-gray-800 font-medium">
+                          {notification.message}
+                        </p>
+                      </Link>
+                    )}
+                    <small className="text-xs text-gray-500 mt-1 block">
+                      {formatDate(notification.created_at)}
+                    </small>
                   </div>
-                ) : (
-                  <Link href={href} className="block">
-                    <p>{notification.message}</p>
-                    <small>{formatDate(notification.created_at)}</small>
-                  </Link>
-                )}
+                </div>
               </div>
             )
           })}
