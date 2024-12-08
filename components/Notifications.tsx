@@ -10,6 +10,10 @@ interface Notification {
   created_at: string | Date
   notification_type: string
   calendar_id: string
+  action?: string
+  calendar_invitation?: {
+    status: string
+  }
   user: {
     id: number
     nickname: string
@@ -40,8 +44,15 @@ export default function Notifications() {
           },
         )
         const data = await response.json()
-        setNotifications(Array.isArray(data) ? data : [])
-        notificationsRef.current = Array.isArray(data) ? data : []
+        const filteredNotifications = Array(data)
+          ? data.filter(
+              (notification: Notification) =>
+                notification.action !== 'sent' ||
+                notification.calendar_invitation?.status !== 'accepted',
+            )
+          : []
+        setNotifications(filteredNotifications)
+        notificationsRef.current = filteredNotifications
       } catch (error) {
         console.error('Error fetching notifications:', error)
         setNotifications([])
@@ -119,6 +130,52 @@ export default function Notifications() {
     }
   }
 
+  const handleAcceptInvitation = async (calendarId: string) => {
+    try {
+      await fetch(
+        `http://localhost:3001/api/v1/calendars/${calendarId}/accept_invitation`,
+        {
+          method: 'POST',
+          headers: {
+            'access-token': localStorage.getItem('access-token') || '',
+            client: localStorage.getItem('client') || '',
+            uid: localStorage.getItem('uid') || '',
+          },
+        },
+      )
+
+      setNotifications((prev) =>
+        prev.filter((n) => n.calendar_id !== calendarId),
+      )
+    } catch (error) {
+      console.error('Error accepting invitation:', error)
+      toast.error('Failed to accept invitation')
+    }
+  }
+
+  const handleRejectInvitation = async (calendarId: string) => {
+    try {
+      await fetch(
+        `http://localhost:3001/api/v1/calendars/${calendarId}/reject_invitation`,
+        {
+          method: 'POST',
+          headers: {
+            'access-token': localStorage.getItem('access-token') || '',
+            client: localStorage.getItem('client') || '',
+            uid: localStorage.getItem('uid') || '',
+          },
+        },
+      )
+
+      setNotifications((prev) =>
+        prev.filter((n) => n.calendar_id !== calendarId),
+      )
+    } catch (error) {
+      console.error('Error rejecting invitation:', error)
+      toast.error('Failed to reject invitation')
+    }
+  }
+
   return (
     <div className="notifications-container">
       <div
@@ -147,14 +204,36 @@ export default function Notifications() {
             }
 
             return (
-              <Link
+              <div
                 key={`${notification.id}-${notification.created_at}`}
-                href={href}
                 className="notification-item"
               >
-                <p>{notification.message}</p>
-                <small>{formatDate(notification.created_at)}</small>
-              </Link>
+                {notification.notification_type === 'invitation_sent' ? (
+                  <div>
+                    <p>{notification.message}</p>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => handleAcceptInvitation(calendarId)}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleRejectInvitation(calendarId)}
+                        className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                    <small>{formatDate(notification.created_at)}</small>
+                  </div>
+                ) : (
+                  <Link href={href} className="block">
+                    <p>{notification.message}</p>
+                    <small>{formatDate(notification.created_at)}</small>
+                  </Link>
+                )}
+              </div>
             )
           })}
         </div>
