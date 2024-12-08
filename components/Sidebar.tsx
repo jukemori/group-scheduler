@@ -42,7 +42,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     }
 
     fetchCalendars()
-  }, [])
+  }, [pathname])
 
   const handleCalendarSelect = (calendarId: number) => {
     localStorage.setItem('calendar-id', calendarId.toString())

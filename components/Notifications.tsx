@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { webSocketService } from '@/utils/websocket'
+import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -28,6 +29,7 @@ interface Notification {
 }
 
 export default function Notifications() {
+  const router = useRouter()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const notificationsRef = useRef<Notification[]>([])
@@ -149,6 +151,8 @@ export default function Notifications() {
       setNotifications((prev) =>
         prev.filter((n) => n.calendar_id !== calendarId),
       )
+      router.refresh()
+      router.push(`/calendars/${calendarId}`)
     } catch (error) {
       console.error('Error accepting invitation:', error)
       toast.error('Failed to accept invitation')
