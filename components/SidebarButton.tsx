@@ -63,9 +63,9 @@ export function SidebarButton({
           <span>{children}</span>
         )}
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+          <span className="h-auto p-0 hover:bg-transparent">
             <MoreHorizontal />
-          </Button>
+          </span>
         </DropdownMenuTrigger>
       </Button>
       <DropdownMenuContent side="right" align="start" className="rounded-lg">
