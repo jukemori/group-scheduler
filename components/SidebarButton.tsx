@@ -1,4 +1,4 @@
-import { LucideIcon, MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal } from 'lucide-react'
 import { Button, ButtonProps } from './ui/button'
 import { cn } from '@/lib/utils'
 import {
@@ -11,14 +11,12 @@ import { useState } from 'react'
 import { Input } from './ui/input'
 
 interface SidebarButtonProps extends ButtonProps {
-  icon?: LucideIcon
   onEdit?: (newName: string) => void
   onDelete?: () => void
   isEditing?: boolean
 }
 
 export function SidebarButton({
-  icon: Icon,
   className,
   children,
   onEdit,
@@ -44,7 +42,6 @@ export function SidebarButton({
         className={cn('gap-2 justify-between', className)}
         {...props}
       >
-        {Icon && <Icon size={20} />}
         {isEditing ? (
           <form
             onSubmit={handleSubmit}
