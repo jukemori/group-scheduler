@@ -1,22 +1,37 @@
 'use client'
-import { usePathname, useRouter } from 'next/navigation'
+import { MoreHorizontal } from 'lucide-react'
+import { SidebarDesktop } from './SidebarDesktop'
+import { SidebarItems } from '@/types/sidebar'
+import { SidebarButton } from './SidebarButton'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-
-interface SidebarProps {
-  calendarId: string
-  isOpen: boolean
-}
 
 interface Calendar {
   id: number
   name: string
 }
 
-export default function Sidebar({ isOpen }: SidebarProps) {
-  const pathname = usePathname()
+const sidebarItems: SidebarItems = {
+  calendars: [],
+  // extras: (
+  //   <div className="flex flex-col gap-2">
+  //     <SidebarButton icon={MoreHorizontal} className="w-full">
+  //       More
+  //     </SidebarButton>
+  //     <SidebarButton
+  //       className="w-full justify-center text-white"
+  //       variant="default"
+  //     >
+  //       Tweet
+  //     </SidebarButton>
+  //   </div>
+  // ),
+}
+
+export function Sidebar() {
   const [calendars, setCalendars] = useState<Calendar[]>([])
-  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     const fetchCalendars = async () => {
@@ -44,35 +59,5 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     fetchCalendars()
   }, [pathname])
 
-  const handleCalendarSelect = (calendarId: number) => {
-    localStorage.setItem('calendar-id', calendarId.toString())
-    router.push(`/calendars/${calendarId}`)
-  }
-
-  return (
-    <aside
-      className={`transition-all duration-300 ease-in-out ${
-        isOpen ? 'w-64' : 'w-0'
-      } flex-shrink-0 bg-gray-100 min-h-[calc(100vh-64px)] overflow-hidden`}
-    >
-      <div className="p-4 w-64">
-        <h2 className="text-lg font-semibold mb-4">Calendars</h2>
-        <nav className="space-y-2">
-          {calendars.map((calendar) => (
-            <div
-              key={calendar.id}
-              onClick={() => handleCalendarSelect(calendar.id)}
-              className={`block p-2 rounded cursor-pointer hover:bg-gray-200 ${
-                pathname.startsWith(`/calendars/${calendar.id}`)
-                  ? 'bg-gray-200'
-                  : ''
-              }`}
-            >
-              {calendar.name}
-            </div>
-          ))}
-        </nav>
-      </div>
-    </aside>
-  )
+  return <SidebarDesktop sidebarItems={sidebarItems} calendars={calendars} />
 }
