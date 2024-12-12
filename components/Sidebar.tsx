@@ -13,11 +13,12 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 
-import { SidebarButton } from './SidebarButton'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Input } from '@/components/ui/input'
+import { useMediaQuery } from 'usehooks-ts'
+import { SidebarMobile } from './SidebarMobile'
 
 interface Calendar {
   id: number
@@ -28,6 +29,9 @@ export function Sidebar() {
   const [calendars, setCalendars] = useState<Calendar[]>([])
   const pathname = usePathname()
   const [newCalendarName, setNewCalendarName] = useState('')
+  const isDesktop = useMediaQuery('(min-width: 640px)', {
+    initializeWithValue: false,
+  })
 
   const handleCreateCalendar = async (calendarName: string) => {
     const accessToken = localStorage.getItem('access-token')
@@ -119,5 +123,9 @@ export function Sidebar() {
     fetchCalendars()
   }, [pathname])
 
-  return <SidebarDesktop sidebarItems={sidebarItems} calendars={calendars} />
+  if (isDesktop) {
+    return <SidebarDesktop sidebarItems={sidebarItems} calendars={calendars} />
+  } else {
+    return <SidebarMobile sidebarItems={sidebarItems} calendars={calendars} />
+  }
 }

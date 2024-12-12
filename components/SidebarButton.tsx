@@ -9,6 +9,7 @@ import {
 } from './ui/dropdown-menu'
 import { useState } from 'react'
 import { Input } from './ui/input'
+import { SheetClose } from './ui/sheet'
 
 interface SidebarButtonProps extends ButtonProps {
   onEdit?: (newName: string) => void
@@ -74,5 +75,13 @@ export function SidebarButton({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+export function SidebarButtonSheet(props: SidebarButtonProps) {
+  return (
+    <SheetClose asChild>
+      <SidebarButton {...props} />
+    </SheetClose>
   )
 }
