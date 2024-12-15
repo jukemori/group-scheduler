@@ -27,7 +27,7 @@ export const userApi = {
       localStorage.removeItem('access-token')
       localStorage.removeItem('client')
       localStorage.removeItem('uid')
-      window.location.href = '/'
+      window.location.href = '/login'
     } catch (error) {
       console.error('Error during logout:', error)
       throw error
