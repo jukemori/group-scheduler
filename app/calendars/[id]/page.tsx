@@ -65,7 +65,7 @@ export default function Dashboard() {
     }
 
     if (!(accessToken && client && uid)) {
-      router.push('/')
+      router.push('/login')
     } else {
       fetchUsers()
       setTimeout(() => {
