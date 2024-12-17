@@ -29,7 +29,13 @@ export default function Login() {
       localStorage.setItem('access-token', response.headers['access-token'])
       localStorage.setItem('client', response.headers['client'])
       localStorage.setItem('uid', response.headers['uid'])
-      router.push('/calendars')
+
+      const savedCalendarId = localStorage.getItem('calendar-id')
+      if (savedCalendarId) {
+        router.push(`/calendars/${savedCalendarId}`)
+      } else {
+        router.push('/calendars/new')
+      }
     } catch (err) {
       setError((err as any).response?.data || 'An error occurred')
     }

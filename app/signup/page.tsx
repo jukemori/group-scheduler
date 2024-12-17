@@ -43,12 +43,10 @@ export default function Signup() {
         },
       )
 
-      console.log('Response:', response)
-
       localStorage.setItem('access-token', response.headers['access-token'])
       localStorage.setItem('client', response.headers['client'])
       localStorage.setItem('uid', response.headers['uid'])
-      router.push('/calendars')
+      router.push('/calendars/new')
     } catch (err) {
       console.error('Full error:', err)
       setError(
