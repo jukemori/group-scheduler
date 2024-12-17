@@ -12,8 +12,13 @@ export default function CalendarLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const calendarId = pathname.split('/')[2]
   const scheduleRef = useRef<ScheduleComponent>(null)
+
+  if (pathname === '/calendars/new') {
+    return children
+  }
+
+  const calendarId = pathname.split('/')[2]
 
   return (
     <ScheduleContext.Provider value={{ scheduleRef }}>
