@@ -184,11 +184,6 @@ export default function Notifications() {
 
   return (
     <div className="notifications-container">
-      <div
-        className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}
-      >
-        WebSocket: {isConnected ? 'Connected' : 'Disconnected'}
-      </div>
       {notifications.length === 0 ? (
         <div className="no-notifications">No notifications</div>
       ) : (
