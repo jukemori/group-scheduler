@@ -41,11 +41,17 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
         { headers },
       )
 
-      setLocalCalendars((prevCalendars) =>
-        prevCalendars.map((cal) =>
-          cal.id === id ? { ...cal, name: newName } : cal,
-        ),
-      )
+      setLocalCalendars((prevCalendars) => {
+        const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
+        if (updatedCalendars.length > 0) {
+          const firstCalendarId = updatedCalendars[0].id
+          localStorage.setItem('calendar-id', firstCalendarId.toString())
+          router.push(`/calendars/${firstCalendarId}`)
+        } else {
+          router.push('/calendars/new')
+        }
+        return updatedCalendars
+      })
     } catch (err) {
       console.error('Failed to update calendar')
     }

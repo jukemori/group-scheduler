@@ -66,9 +66,17 @@ export function SidebarDesktop({
         headers,
       })
 
-      setLocalCalendars((prevCalendars) =>
-        prevCalendars.filter((cal) => cal.id !== id),
-      )
+      setLocalCalendars((prevCalendars) => {
+        const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
+        if (updatedCalendars.length > 0) {
+          const firstCalendarId = updatedCalendars[0].id
+          localStorage.setItem('calendar-id', firstCalendarId.toString())
+          router.push(`/calendars/${firstCalendarId}`)
+        } else {
+          router.push('/calendars/new')
+        }
+        return updatedCalendars
+      })
     } catch (err) {
       console.error('Failed to delete calendar')
     }
