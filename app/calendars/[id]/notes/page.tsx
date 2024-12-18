@@ -1,5 +1,5 @@
 'use client'
-import CalendarNotes from '@/components/CalendarNotes'
+import NotesList from '@/components/NotesList'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -54,7 +54,7 @@ export default function NotesPage() {
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-lg font-bold mb-4">{calendarTitle} Notes</h2>
-      <CalendarNotes calendarId={params.id as string} />
+      <NotesList calendarId={params.id as string} />
     </div>
   )
 }
