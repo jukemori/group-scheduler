@@ -86,7 +86,7 @@ export default function MembersPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-8">
-        <h3 className="text-lg font-semibold mb-4">Current Members</h3>
+        <h2 className="text-lg font-semibold mb-4">Current Members</h2>
         <ul className="flex flex-wrap gap-4">
           {members.map((member: any) => (
             <li key={member.Id} className="flex flex-col items-center gap-2">
