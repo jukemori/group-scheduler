@@ -1,5 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import Note from './Note'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogHeader,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 
 interface Note {
   id: number
@@ -10,29 +22,56 @@ interface Note {
     id: number
     nickname: string
     email: string
+    photoUrl: string
   }
 }
 
 export default function NotesList({ calendarId }: { calendarId: string }) {
+  const [calendarTitle, setCalendarTitle] = useState('')
   const [notes, setNotes] = useState<Note[]>([])
   const [newNote, setNewNote] = useState('')
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null)
   const [editingContent, setEditingContent] = useState('')
+
+  const getAuthHeaders = () => {
+    return {
+      'access-token': localStorage.getItem('access-token') || '',
+      client: localStorage.getItem('client') || '',
+      uid: localStorage.getItem('uid') || '',
+    }
+  }
+  const fetchCalendarDetails = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}`,
+        {
+          headers: getAuthHeaders(),
+        },
+      )
+      const data = await response.json()
+      setCalendarTitle(data.name)
+    } catch (error) {
+      console.error('Error fetching calendar details:', error)
+    }
+  }, [calendarId])
 
   const fetchNotes = useCallback(async () => {
     try {
       const response = await fetch(
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes`,
         {
-          headers: {
-            'access-token': localStorage.getItem('access-token') || '',
-            client: localStorage.getItem('client') || '',
-            uid: localStorage.getItem('uid') || '',
-          },
+          headers: getAuthHeaders(),
         },
       )
       const data = await response.json()
-      setNotes(Array.isArray(data) ? data : [])
+      const sortedNotes = Array.isArray(data)
+        ? data.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
+          )
+        : []
+      setNotes(sortedNotes)
     } catch (error) {
       console.error('Error fetching notes:', error)
       setNotes([])
@@ -45,12 +84,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'access-token': localStorage.getItem('access-token') || '',
-            client: localStorage.getItem('client') || '',
-            uid: localStorage.getItem('uid') || '',
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ calendar_note: { content: newNote } }),
         },
       )
@@ -69,11 +103,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes/${noteId}`,
         {
           method: 'DELETE',
-          headers: {
-            'access-token': localStorage.getItem('access-token') || '',
-            client: localStorage.getItem('client') || '',
-            uid: localStorage.getItem('uid') || '',
-          },
+          headers: getAuthHeaders(),
         },
       )
       fetchNotes()
@@ -88,12 +118,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes/${noteId}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'access-token': localStorage.getItem('access-token') || '',
-            client: localStorage.getItem('client') || '',
-            uid: localStorage.getItem('uid') || '',
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ calendar_note: { content: editingContent } }),
         },
       )
@@ -109,24 +134,40 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
 
   useEffect(() => {
     fetchNotes()
-  }, [fetchNotes])
+    fetchCalendarDetails()
+  }, [fetchNotes, fetchCalendarDetails])
 
   return (
     <div>
-      <div className="mb-4">
-        <textarea
-          value={newNote}
-          onChange={(e) => setNewNote(e.target.value)}
-          className="w-full p-2 border rounded"
-          placeholder="Add a new note..."
-          rows={4}
-        />
-        <button
-          onClick={createNote}
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Add Note
-        </button>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold">{calendarTitle} Notes</h2>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Create</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Note</DialogTitle>
+              <DialogDescription>
+                Add your note content below. You can include any important
+                information or reminders.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Textarea
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              className="w-full p-2 border rounded"
+              placeholder="Add a new note..."
+              rows={4}
+            />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button onClick={createNote}>Create</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="space-y-4">
         {Array.isArray(notes) &&
