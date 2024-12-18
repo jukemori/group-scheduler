@@ -5,6 +5,14 @@ import axios from 'axios'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card'
 
 export default function MembersPage() {
   const [inviteEmail, setInviteEmail] = useState('')
@@ -94,41 +102,47 @@ export default function MembersPage() {
         </ul>
       </div>
 
-      <div className="bg-gray-50 p-6 rounded-lg border">
-        <h3 className="text-lg font-semibold mb-4">
-          Invite Users to {calendarTitle}
-        </h3>
+      <Card className="max-w-lg shadow-none bg-gray-50">
+        <CardHeader>
+          <CardTitle>Invite Users to {calendarTitle}</CardTitle>
+          <CardDescription>Share your calendar with friends</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="bg-red-50 text-red-500 p-3 rounded mb-4">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 text-green-500 p-3 rounded mb-4">
+              {success}
+            </div>
+          )}
 
-        {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded mb-4">{error}</div>
-        )}
-        {success && (
-          <div className="bg-green-50 text-green-500 p-3 rounded mb-4">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleInvite} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Email Address
-            </label>
-            <Input
-              type="email"
-              id="email"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-              className="flex-1 mb-4 bg-white"
-              placeholder="Enter email address"
-              required
-            />
-            <Button type="submit">Send Invitation</Button>
-          </div>
-        </form>
-      </div>
+          <form onSubmit={handleInvite} className="space-y-4">
+            <div className="flex flex-col space-y-1.5">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Email Address
+              </label>
+              <Input
+                type="email"
+                id="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                className="flex-1 mb-4 bg-white"
+                placeholder="Enter email address"
+                required
+              />
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button type="submit">Send Invitation</Button>
+        </CardFooter>
+      </Card>
     </div>
   )
 }
