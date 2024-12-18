@@ -47,7 +47,6 @@ export default function MembersPage() {
         },
       )
       const data = await response.json()
-      console.log(data)
       setCalendarTitle(data.name)
     } catch (error) {
       console.error('Error fetching calendar details:', error)
@@ -77,7 +76,7 @@ export default function MembersPage() {
     }
   }
   return (
-    <div className="p-4">
+    <div className="container mx-auto p-4">
       <div className="mb-8">
         <h3 className="text-lg font-semibold mb-4">Current Members</h3>
         <ul className="flex flex-wrap gap-4">
