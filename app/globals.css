@@ -130,12 +130,13 @@
 }
 
 .e-schedule {
-  border-radius: var(--border-radius-lg);
   border-color: hsl(var(--border));
   font-family: var(--schedule-font-family);
   font-style: normal;
   font-size: 14px !important;
   text-transform: capitalize !important;
+  border: none;
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .e-schedule .e-schedule-toolbar .e-tbar-btn .e-tbar-btn-text,
@@ -177,12 +178,98 @@
   font-weight: 600;
 }
 
+.e-schedule .e-schedule-toolbar {
+  margin-bottom: 2rem;
+}
+
+.e-schedule .e-month-view .e-header-cells {
+  padding-bottom: 1.5rem;
+}
+
 .e-schedule .e-month-view .e-date-header-wrap table td {
   font-size: 14px !important;
 }
 
-.e-toolbar-item.e-today {
-  display: none;
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(1):not(.e-header-row *)::before {
+  content: "Sun";
+  display: block;
+}
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(2):not(.e-header-row *)::before {
+  content: "Mon";
+  display: block;
+}
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(3):not(.e-header-row *)::before {
+  content: "Tue";
+  display: block;
+}
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(4):not(.e-header-row *)::before {
+  content: "Wed";
+  display: block;
+}
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(5):not(.e-header-row *)::before {
+  content: "Thu";
+  display: block;
+}
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(6):not(.e-header-row *)::before {
+  content: "Fri";
+  display: block;
+}
+.e-schedule
+  .e-schedule-table
+  tbody
+  tr:not(.e-header-row)
+  .e-header-cells:nth-child(7):not(.e-header-row *)::before {
+  content: "Sat";
+  display: block;
+}
+
+.e-toolbar-item.e-today,
+.e-toolbar-item.e-schedule-seperator.e-separator,
+.e-schedule .e-schedule-table .e-header-cells span,
+.e-schedule
+  .e-vertical-view
+  .e-left-indent-wrap
+  table
+  tbody
+  td.e-header-cells:before {
+  display: none !important;
+}
+
+.e-schedule .e-month-view .e-date-header-wrap table td,
+.e-schedule .e-month-view .e-work-cells {
+  border: none;
+}
+
+.e-schedule .e-month-view .e-work-cells,
+.e-schedule .e-schedule-toolbar,
+.e-toolbar .e-toolbar-items,
+.e-toolbar .e-toolbar-item .e-tbar-btn,
+.e-btn {
+  background: transparent;
 }
 
 .e-quick-popup-wrapper,
