@@ -137,6 +137,7 @@
   text-transform: capitalize !important;
   border: none;
   border-bottom: 1px solid hsl(var(--border));
+  height: 80vh !important;
 }
 
 .e-schedule .e-schedule-toolbar .e-tbar-btn .e-tbar-btn-text,
