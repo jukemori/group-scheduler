@@ -145,7 +145,11 @@
 .e-btn.e-flat,
 .e-footer-content .e-btn:not(.e-primary),
 .e-dlg-header *,
-.e-checkbox-wrapper .e-label {
+.e-checkbox-wrapper .e-label,
+.e-schedule .e-vertical-view .e-header-cells .e-header-day,
+.e-schedule .e-vertical-view .e-header-cells .e-header-date,
+.e-schedule .e-agenda-view .e-day-date-header,
+.e-schedule .e-agenda-view .e-subject {
   color: var(--text-color);
   font-weight: 500;
 }
