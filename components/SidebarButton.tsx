@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { Button, ButtonProps } from './ui/button'
 import { cn } from '@/lib/utils'
 import {
@@ -10,11 +10,19 @@ import {
 import { useState } from 'react'
 import { Input } from './ui/input'
 import { SheetClose } from './ui/sheet'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+  DialogDescription,
+} from './ui/dialog'
 
 interface SidebarButtonProps extends ButtonProps {
   onEdit?: (newName: string) => void
   onDelete?: () => void
-  isEditing?: boolean
 }
 
 export function SidebarButton({
@@ -24,57 +32,77 @@ export function SidebarButton({
   onDelete,
   ...props
 }: SidebarButtonProps) {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editedName, setEditedName] = useState(children?.toString() || '')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    e.stopPropagation()
     if (onEdit) {
       onEdit(editedName)
     }
-    setIsEditing(false)
+    setIsDialogOpen(false)
   }
 
   return (
-    <DropdownMenu>
-      <Button
-        variant="ghost"
-        className={cn('gap-2 justify-between', className)}
-        {...props}
-      >
-        {isEditing ? (
-          <form
-            onSubmit={handleSubmit}
-            className="flex-1"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Input
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-              className="h-6 p-0 w-full border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              autoFocus
-              onBlur={() => setIsEditing(false)}
-            />
-          </form>
-        ) : (
+    <>
+      <DropdownMenu>
+        <Button
+          variant="ghost"
+          className={cn('gap-2 justify-between', className)}
+          {...props}
+        >
           <span>{children}</span>
-        )}
-        <DropdownMenuTrigger asChild>
-          <span className="h-auto p-0 hover:bg-transparent">
-            <MoreHorizontal />
-          </span>
-        </DropdownMenuTrigger>
-      </Button>
-      <DropdownMenuContent side="right" align="start" className="rounded-lg">
-        <DropdownMenuItem onClick={() => setIsEditing(true)}>
-          <span>Edit Calendar</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete}>
-          <span>Delete Calendar</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <span className="h-auto p-0 hover:bg-transparent">
+              <MoreHorizontal />
+            </span>
+          </DropdownMenuTrigger>
+        </Button>
+        <DropdownMenuContent side="right" align="start" className="rounded-lg">
+          <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+            <Pencil />
+            <span>Edit</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onDelete}>
+            <Trash2 />
+            <span>Delete</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Name</DialogTitle>
+            <DialogDescription>
+              Enter a new name for your calendar.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <div>
+                <label className="block text-sm font-medium  mb-2">
+                  Calendar Name
+                </label>
+                <Input
+                  id="name"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button className="mt-4" type="submit">
+                  Save changes
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
