@@ -60,7 +60,7 @@ export default function Note({
             <Textarea
               value={editingContent}
               onChange={(e) => setEditingContent(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 shadow-none"
               rows={4}
             />
           </CardContent>
