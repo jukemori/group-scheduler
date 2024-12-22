@@ -10,6 +10,17 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './ui/alert-dialog'
+import { useState } from 'react'
 
 interface NoteProps {
   note: {
@@ -40,6 +51,13 @@ export default function Note({
   updateNote,
   deleteNote,
 }: NoteProps) {
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
+
+  const handleDelete = () => {
+    deleteNote(note.id)
+    setIsDeleteAlertOpen(false)
+  }
+
   return (
     <div>
       {editingNoteId === note.id ? (
@@ -105,7 +123,7 @@ export default function Note({
                 <Pencil />
                 <span>Edit</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => deleteNote(note.id)}>
+              <DropdownMenuItem onClick={() => setIsDeleteAlertOpen(true)}>
                 <Trash2 />
                 <span>Delete</span>
               </DropdownMenuItem>
@@ -113,6 +131,22 @@ export default function Note({
           </Card>
         </DropdownMenu>
       )}
+
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Note</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this note? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
