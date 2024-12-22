@@ -19,6 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from './ui/alert-dialog'
 import { useState } from 'react'
 
@@ -51,13 +52,6 @@ export default function Note({
   updateNote,
   deleteNote,
 }: NoteProps) {
-  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
-
-  const handleDelete = () => {
-    deleteNote(note.id)
-    setIsDeleteAlertOpen(false)
-  }
-
   return (
     <div>
       {editingNoteId === note.id ? (
@@ -87,66 +81,70 @@ export default function Note({
           </CardFooter>
         </Card>
       ) : (
-        <DropdownMenu>
-          <Card className="relative">
-            <CardHeader>
-              <div className="flex gap-2 items-center">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={note.user.photoUrl} />
-                  <AvatarFallback>
-                    {note.user?.nickname?.substring(0, 2) || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <span>{note.user.nickname}</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="whitespace-pre-wrap">{note.content}</p>
-            </CardContent>
-            <CardFooter>
-              <span className="text-xs text-gray-500">
-                {format(new Date(note.created_at), 'MMMM d, yyyy')}
-              </span>
-            </CardFooter>
-            <DropdownMenuTrigger asChild>
-              <span className="h-auto p-0 hover:bg-transparent absolute top-2 right-3 hover:cursor-pointer">
-                <MoreHorizontal />
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onClick={() => {
-                  setEditingNoteId(note.id)
-                  setEditingContent(note.content)
-                }}
-              >
-                <Pencil />
-                <span>Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsDeleteAlertOpen(true)}>
-                <Trash2 />
-                <span>Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </Card>
-        </DropdownMenu>
-      )}
+        <AlertDialog>
+          <DropdownMenu>
+            <Card className="relative">
+              <CardHeader>
+                <div className="flex gap-2 items-center">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={note.user.photoUrl} />
+                    <AvatarFallback>
+                      {note.user?.nickname?.substring(0, 2) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>{note.user.nickname}</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="whitespace-pre-wrap">{note.content}</p>
+              </CardContent>
+              <CardFooter>
+                <span className="text-xs text-gray-500">
+                  {format(new Date(note.created_at), 'MMMM d, yyyy')}
+                </span>
+              </CardFooter>
+              <DropdownMenuTrigger asChild>
+                <span className="h-auto p-0 hover:bg-transparent absolute top-2 right-3 hover:cursor-pointer">
+                  <MoreHorizontal />
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditingNoteId(note.id)
+                    setEditingContent(note.content)
+                  }}
+                >
+                  <Pencil />
+                  <span>Edit</span>
+                </DropdownMenuItem>
 
-      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Note</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this note? This action cannot be
-              undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+                <AlertDialogTrigger>
+                  <DropdownMenuItem>
+                    <Trash2 />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+              </DropdownMenuContent>
+            </Card>
+          </DropdownMenu>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Note</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this note? This action cannot be
+                undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => deleteNote(note.id)}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   )
 }
