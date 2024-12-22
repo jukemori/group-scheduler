@@ -7,6 +7,7 @@ import { SidebarButtonSheet as SidebarButton } from './SidebarButton'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { userApi } from '@/lib/api/users'
 
 interface SidebarMobileProps {
   sidebarItems: SidebarItems
@@ -17,10 +18,24 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [localCalendars, setLocalCalendars] = useState<Calendar[]>(calendars)
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
 
   useEffect(() => {
     setLocalCalendars(calendars)
   }, [calendars])
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await userApi.getCurrentUser()
+        setCurrentUserId(user.id)
+      } catch (err) {
+        console.error('Failed to fetch current user')
+      }
+    }
+
+    fetchCurrentUser()
+  }, [])
 
   const handleCalendarSelect = (calendarId: number) => {
     localStorage.setItem('calendar-id', calendarId.toString())
@@ -41,17 +56,11 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
         { headers },
       )
 
-      setLocalCalendars((prevCalendars) => {
-        const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
-        if (updatedCalendars.length > 0) {
-          const firstCalendarId = updatedCalendars[0].id
-          localStorage.setItem('calendar-id', firstCalendarId.toString())
-          router.push(`/calendars/${firstCalendarId}`)
-        } else {
-          router.push('/calendars/new')
-        }
-        return updatedCalendars
-      })
+      setLocalCalendars((prevCalendars) =>
+        prevCalendars.map((cal) =>
+          cal.id === id ? { ...cal, name: newName } : cal,
+        ),
+      )
     } catch (err) {
       console.error('Failed to update calendar')
     }
@@ -69,11 +78,47 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
         headers,
       })
 
-      setLocalCalendars((prevCalendars) =>
-        prevCalendars.filter((cal) => cal.id !== id),
-      )
+      setLocalCalendars((prevCalendars) => {
+        const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
+        if (updatedCalendars.length > 0) {
+          const firstCalendarId = updatedCalendars[0].id
+          localStorage.setItem('calendar-id', firstCalendarId.toString())
+          router.push(`/calendars/${firstCalendarId}`)
+        } else {
+          router.push('/calendars/new')
+        }
+        return updatedCalendars
+      })
     } catch (err) {
       console.error('Failed to delete calendar')
+    }
+  }
+
+  const handleLeave = async (id: number) => {
+    try {
+      const headers = {
+        'access-token': localStorage.getItem('access-token'),
+        client: localStorage.getItem('client'),
+        uid: localStorage.getItem('uid'),
+      }
+
+      await axios.delete(`http://127.0.0.1:3001/api/v1/calendars/${id}/leave`, {
+        headers,
+      })
+
+      setLocalCalendars((prevCalendars) => {
+        const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
+        if (updatedCalendars.length > 0) {
+          const firstCalendarId = updatedCalendars[0].id
+          localStorage.setItem('calendar-id', firstCalendarId.toString())
+          router.push(`/calendars/${firstCalendarId}`)
+        } else {
+          router.push('/calendars/new')
+        }
+        return updatedCalendars
+      })
+    } catch (err) {
+      console.error('Failed to leave calendar')
     }
   }
 
@@ -98,6 +143,8 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
                 onClick={() => handleCalendarSelect(calendar.id)}
                 onEdit={(newName) => handleEdit(calendar.id, newName)}
                 onDelete={() => handleDelete(calendar.id)}
+                onLeave={() => handleLeave(calendar.id)}
+                isCreator={calendar.creator_id === currentUserId}
                 variant={
                   pathname.startsWith(`/calendars/${calendar.id}`)
                     ? 'secondary'

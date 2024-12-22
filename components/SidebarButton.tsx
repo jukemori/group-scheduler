@@ -1,4 +1,5 @@
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { MoreHorizontal, Pencil, Trash2, LogOut } from 'lucide-react'
 import { Button, ButtonProps } from './ui/button'
 import { cn } from '@/lib/utils'
 import {
@@ -7,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from './ui/dropdown-menu'
-import { useState } from 'react'
 import { Input } from './ui/input'
 import { SheetClose } from './ui/sheet'
 import {
@@ -35,18 +35,38 @@ import {
 interface SidebarButtonProps extends ButtonProps {
   onEdit?: (newName: string) => void
   onDelete?: () => void
+  onLeave?: () => void
+  isCreator?: boolean
 }
+
+let currentOpenDropdownId: string | null = null
 
 export function SidebarButton({
   className,
   children,
   onEdit,
   onDelete,
+  onLeave,
+  isCreator,
   ...props
 }: SidebarButtonProps) {
   const [editedName, setEditedName] = useState(children?.toString() || '')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [alertAction, setAlertAction] = useState<'delete' | 'leave'>('delete')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownId = React.useId()
+
+  useEffect(() => {
+    if (isDropdownOpen) {
+      if (currentOpenDropdownId && currentOpenDropdownId !== dropdownId) {
+        setIsDropdownOpen(false)
+      }
+      currentOpenDropdownId = dropdownId
+    } else if (currentOpenDropdownId === dropdownId) {
+      currentOpenDropdownId = null
+    }
+  }, [isDropdownOpen, dropdownId])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,9 +76,18 @@ export function SidebarButton({
     setTimeout(() => (document.body.style.pointerEvents = ''), 500)
   }
 
-  const handleDelete = () => {
-    if (onDelete) {
+  const handleAlertOpenChange = (open: boolean) => {
+    setIsAlertOpen(open)
+    if (!open) {
+      setTimeout(() => (document.body.style.pointerEvents = ''), 500)
+    }
+  }
+
+  const handleAlertAction = () => {
+    if (alertAction === 'delete' && onDelete) {
       onDelete()
+    } else if (alertAction === 'leave' && onLeave) {
+      onLeave()
     }
     setTimeout(() => (document.body.style.pointerEvents = ''), 500)
   }
@@ -70,18 +99,11 @@ export function SidebarButton({
     }
   }
 
-  const handleAlertOpenChange = (open: boolean) => {
-    setIsAlertOpen(open)
-    if (!open) {
-      setTimeout(() => (document.body.style.pointerEvents = ''), 500)
-    }
-  }
-
   return (
     <>
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
         <AlertDialog open={isAlertOpen} onOpenChange={handleAlertOpenChange}>
-          <DropdownMenu>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <Button
               variant="ghost"
               className={cn('gap-2 justify-between', className)}
@@ -89,7 +111,7 @@ export function SidebarButton({
             >
               <span>{children}</span>
               <DropdownMenuTrigger asChild>
-                <span className="h-auto p-0 hover:bg-transparent">
+                <span className="h-auto p-0 hover:bg-transparent dropdown-trigger">
                   <MoreHorizontal />
                 </span>
               </DropdownMenuTrigger>
@@ -105,27 +127,48 @@ export function SidebarButton({
                   <span>Edit</span>
                 </DropdownMenuItem>
               </DialogTrigger>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem>
-                  <Trash2 />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
+              {!isCreator && onLeave && (
+                <AlertDialogTrigger
+                  asChild
+                  onClick={() => setAlertAction('leave')}
+                >
+                  <DropdownMenuItem>
+                    <LogOut />
+                    <span>Leave</span>
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+              )}
+              {isCreator && (
+                <AlertDialogTrigger
+                  asChild
+                  onClick={() => setAlertAction('delete')}
+                >
+                  <DropdownMenuItem>
+                    <Trash2 />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Calendar</AlertDialogTitle>
+              <AlertDialogTitle>
+                {alertAction === 'delete'
+                  ? 'Delete Calendar'
+                  : 'Leave Calendar'}
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this calendar? This action
-                cannot be undone.
+                {alertAction === 'delete'
+                  ? 'Are you sure you want to delete this calendar? This action cannot be undone.'
+                  : "Are you sure you want to leave this calendar? You'll need to be invited again to rejoin."}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete}>
-                Delete
+              <AlertDialogAction onClick={handleAlertAction}>
+                {alertAction === 'delete' ? 'Delete' : 'Leave'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -166,10 +209,25 @@ export function SidebarButton({
   )
 }
 
-export function SidebarButtonSheet(props: SidebarButtonProps) {
+export function SidebarButtonSheet({
+  className,
+  children,
+  onClick,
+  ...props
+}: SidebarButtonProps) {
+  const handleMainButtonClick = (e: React.MouseEvent) => {
+    if (!(e.target as HTMLElement).closest('.dropdown-trigger')) {
+      onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+    }
+  }
+
   return (
-    <SheetClose asChild>
-      <SidebarButton {...props} />
-    </SheetClose>
+    <SidebarButton
+      {...props}
+      className={className}
+      onClick={handleMainButtonClick}
+    >
+      {children}
+    </SidebarButton>
   )
 }
