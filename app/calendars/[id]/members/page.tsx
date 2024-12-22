@@ -103,23 +103,23 @@ export default function MembersPage() {
       </div>
 
       <Card className="max-w-lg shadow-none bg-gray-50">
-        <CardHeader>
-          <CardTitle>Invite Users to {calendarTitle}</CardTitle>
-          <CardDescription>Share your calendar with friends</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded mb-4">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="bg-green-50 text-green-500 p-3 rounded mb-4">
-              {success}
-            </div>
-          )}
+        <form onSubmit={handleInvite}>
+          <CardHeader>
+            <CardTitle>Invite Users to {calendarTitle}</CardTitle>
+            <CardDescription>Share your calendar with friends</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {error && (
+              <div className="bg-red-50 text-red-500 p-3 rounded mb-4">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-50 text-green-500 p-3 rounded mb-4">
+                {success}
+              </div>
+            )}
 
-          <form onSubmit={handleInvite} className="space-y-4">
             <div className="flex flex-col space-y-1.5">
               <label
                 htmlFor="email"
@@ -137,11 +137,11 @@ export default function MembersPage() {
                 required
               />
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button type="submit">Send Invitation</Button>
-        </CardFooter>
+          </CardContent>
+          <CardFooter className="flex justify-end">
+            <Button type="submit">Send Invitation</Button>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   )
