@@ -148,9 +148,16 @@ export default function Notifications() {
         },
       )
 
-      setNotifications((prev) =>
-        prev.filter((n) => n.calendar_id !== calendarId),
+      const updatedNotifications = notifications.filter(
+        (n) =>
+          !(
+            n.calendar_id === calendarId &&
+            n.notification_type === 'invitation_sent'
+          ),
       )
+      setNotifications(updatedNotifications)
+      notificationsRef.current = updatedNotifications
+
       router.refresh()
       router.push(`/calendars/${calendarId}`)
     } catch (error) {
@@ -173,9 +180,15 @@ export default function Notifications() {
         },
       )
 
-      setNotifications((prev) =>
-        prev.filter((n) => n.calendar_id !== calendarId),
+      const updatedNotifications = notifications.filter(
+        (n) =>
+          !(
+            n.calendar_id === calendarId &&
+            n.notification_type === 'invitation_sent'
+          ),
       )
+      setNotifications(updatedNotifications)
+      notificationsRef.current = updatedNotifications
     } catch (error) {
       console.error('Error rejecting invitation:', error)
       toast.error('Failed to reject invitation')
