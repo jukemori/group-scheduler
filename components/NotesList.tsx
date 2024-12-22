@@ -84,7 +84,10 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes`,
         {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ calendar_note: { content: newNote } }),
         },
       )
@@ -118,7 +121,10 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes/${noteId}`,
         {
           method: 'PUT',
-          headers: getAuthHeaders(),
+          headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ calendar_note: { content: editingContent } }),
         },
       )
