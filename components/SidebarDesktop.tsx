@@ -52,9 +52,6 @@ export function SidebarDesktop({
   }
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this calendar?'))
-      return
-
     try {
       const headers = {
         'access-token': localStorage.getItem('access-token'),

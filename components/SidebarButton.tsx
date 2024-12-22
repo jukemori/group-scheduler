@@ -19,6 +19,16 @@ import {
   DialogClose,
   DialogDescription,
 } from './ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './ui/alert-dialog'
 
 interface SidebarButtonProps extends ButtonProps {
   onEdit?: (newName: string) => void
@@ -33,6 +43,7 @@ export function SidebarButton({
   ...props
 }: SidebarButtonProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [editedName, setEditedName] = useState(children?.toString() || '')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -41,6 +52,13 @@ export function SidebarButton({
       onEdit(editedName)
     }
     setIsDialogOpen(false)
+  }
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete()
+    }
+    setIsAlertOpen(false)
   }
 
   return (
@@ -63,12 +81,28 @@ export function SidebarButton({
             <Pencil />
             <span>Edit</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onDelete}>
+          <DropdownMenuItem onClick={() => setIsAlertOpen(true)}>
             <Trash2 />
             <span>Delete</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Calendar</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this calendar? This action cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
