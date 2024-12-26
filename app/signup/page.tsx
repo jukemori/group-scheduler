@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import axios from 'axios'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -21,34 +21,27 @@ export default function Signup() {
       return
     }
 
-    const signupData = {
-      email,
-      password,
-      password_confirmation: passwordConfirmation,
-      name,
-      nickname,
-      confirm_success_url: 'http://localhost:3000/calendars',
-    }
-    console.log('Sending signup data:', signupData)
-
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:3001/api/v1/auth',
-        signupData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      )
+      await axios.post('http://127.0.0.1:3001/api/v1/auth', {
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+        name,
+        nickname,
+      })
 
-      localStorage.setItem('access-token', response.headers['access-token'])
-      localStorage.setItem('client', response.headers['client'])
-      localStorage.setItem('uid', response.headers['uid'])
-      router.push('/calendars/new')
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        router.push('/calendars/new')
+      }
     } catch (err) {
-      console.error('Full error:', err)
       setError(
         (err as any).response?.data?.errors?.full_messages?.[0] ||
           'An error occurred',
@@ -150,12 +143,6 @@ export default function Signup() {
             <p className="mt-2 text-center text-sm text-red-600">{error}</p>
           )}
         </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
-            Log in
-          </Link>
-        </p>
       </div>
     </div>
   )
