@@ -129,7 +129,10 @@ export default function Login() {
           </div>
 
           <div className="mt-6 flex justify-center">
-            <button className="gsi-material-button">
+            <button
+              className="gsi-material-button"
+              onClick={handleGoogleSignIn}
+            >
               <div className="gsi-material-button-state"></div>
               <div className="gsi-material-button-content-wrapper">
                 <div className="gsi-material-button-icon">
