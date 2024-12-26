@@ -38,6 +38,8 @@ export default function Notifications() {
   const notificationsRef = useRef<Notification[]>([])
 
   useEffect(() => {
+    let mounted = true
+
     const fetchNotifications = async () => {
       try {
         const { data } = await notificationsApi.getNotifications()
@@ -48,18 +50,21 @@ export default function Notifications() {
                 notification.calendar_invitation?.status !== 'accepted',
             )
           : []
-        setNotifications(filteredNotifications)
-        notificationsRef.current = filteredNotifications
+        if (mounted) {
+          setNotifications(filteredNotifications)
+          notificationsRef.current = filteredNotifications
+        }
       } catch (error) {
         console.error('Error fetching notifications:', error)
-        setNotifications([])
-        notificationsRef.current = []
+        if (mounted) {
+          setNotifications([])
+          notificationsRef.current = []
+        }
       }
     }
 
-    const handleConnectionStatus = (status: boolean) => {
-      setIsConnected(status)
-    }
+    // Fetch initial notifications
+    fetchNotifications()
 
     const handleNotification = (notification: Notification) => {
       const processedNotification = {
@@ -82,18 +87,27 @@ export default function Notifications() {
       toast.success(notification.message)
     }
 
+    const handleConnectionStatus = (status: boolean) => {
+      if (mounted) {
+        setIsConnected(status)
+      }
+    }
+
+    // Clean up previous connection if it exists
+    webSocketService.disconnect()
+
+    // Set up new connection
     webSocketService.onConnectionStatus(handleConnectionStatus)
     webSocketService.onNotification(handleNotification)
-
-    fetchNotifications()
     webSocketService.connect()
 
     return () => {
+      mounted = false
       webSocketService.removeNotificationCallback(handleNotification)
       webSocketService.removeConnectionStatusCallback(handleConnectionStatus)
       webSocketService.disconnect()
     }
-  }, [session])
+  }, [])
 
   const formatDate = (dateString: string | Date) => {
     try {
