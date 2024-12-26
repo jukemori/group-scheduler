@@ -1,5 +1,6 @@
 import api from './index'
 import { User, ApiResponse } from './types'
+import { signOut, getSession } from 'next-auth/react'
 
 export const userApi = {
   getCurrentUser: async () => {
@@ -24,10 +25,7 @@ export const userApi = {
   logout: async () => {
     try {
       await api.get('/api/v1/auth/sign_out')
-      localStorage.removeItem('access-token')
-      localStorage.removeItem('client')
-      localStorage.removeItem('uid')
-      window.location.href = '/login'
+      await signOut({ redirect: true, callbackUrl: '/login' })
     } catch (error) {
       console.error('Error during logout:', error)
       throw error
@@ -35,16 +33,13 @@ export const userApi = {
   },
 }
 
-// Add a custom hook for getting the current user
 export const useCurrentUser = () => {
   const getCurrentUser = async () => {
     try {
-      const accessToken = localStorage.getItem('access-token')
-      const client = localStorage.getItem('client')
-      const uid = localStorage.getItem('uid')
+      const session = await getSession()
 
-      if (!accessToken || !client || !uid) {
-        throw new Error('No authentication tokens found')
+      if (!session?.accessToken || !session?.client || !session?.uid) {
+        throw new Error('No authentication session found')
       }
 
       return await userApi.getCurrentUser()
