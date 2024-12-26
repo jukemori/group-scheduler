@@ -12,13 +12,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { userApi } from '@/lib/api/users'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import { User } from '@/lib/api/types'
 
 export function NavUser({ calendarId }: { calendarId: string }) {
-  const { user, loading } = useCurrentUser()
+  const { data: session, status } = useSession()
+  const [userData, setUserData] = useState<User | null>(null)
 
-  if (loading) {
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (status === 'authenticated') {
+        try {
+          const user = await userApi.getCurrentUser()
+          setUserData(user)
+        } catch (error) {
+          console.error('Error fetching user:', error)
+        }
+      }
+    }
+
+    fetchUser()
+  }, [status])
+
+  if (status === 'loading' || !userData) {
     return (
       <Avatar className="h-8 w-8 rounded-lg">
         <AvatarFallback className="rounded-lg">...</AvatarFallback>
@@ -39,14 +57,14 @@ export function NavUser({ calendarId }: { calendarId: string }) {
       <DropdownMenuTrigger asChild>
         <div className="flex items-center gap-2 px-2 py-1.5">
           <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage src={user?.photo_url} alt={user?.nickname} />
+            <AvatarImage src={userData.photo_url} alt={userData.name} />
             <AvatarFallback className="rounded-lg">
-              {user?.nickname?.substring(0, 2) || 'U'}
+              {userData.nickname?.substring(0, 2) || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{user?.nickname}</span>
-            <span className="truncate text-xs">{user?.email}</span>
+            <span className="truncate font-semibold">{userData.nickname}</span>
+            <span className="truncate text-xs">{userData.email}</span>
           </div>
           <ChevronsUpDown className="ml-auto size-4" />
         </div>
@@ -59,14 +77,16 @@ export function NavUser({ calendarId }: { calendarId: string }) {
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-lg">
-              <AvatarImage src={user?.photo_url} alt={user?.nickname} />
+              <AvatarImage src={userData.photo_url} alt={userData.name} />
               <AvatarFallback className="rounded-lg">
-                {user?.nickname?.substring(0, 2) || 'U'}
+                {userData.nickname?.substring(0, 2) || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">{user?.nickname}</span>
-              <span className="truncate text-xs">{user?.email}</span>
+              <span className="truncate font-semibold">
+                {userData.nickname}
+              </span>
+              <span className="truncate text-xs">{userData.email}</span>
             </div>
           </div>
         </DropdownMenuLabel>

@@ -2,9 +2,10 @@
 import { SidebarButton } from './SidebarButton'
 import { SidebarItems, Calendar } from '@/types/sidebar'
 import { usePathname, useRouter } from 'next/navigation'
-import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { userApi } from '@/lib/api/users'
+import api from '@/lib/api'
+import { useSession } from 'next-auth/react'
 
 interface SidebarDesktopProps {
   sidebarItems: SidebarItems
@@ -17,6 +18,7 @@ export function SidebarDesktop({
 }: SidebarDesktopProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const { data: session } = useSession()
   const [localCalendars, setLocalCalendars] = useState<Calendar[]>(calendars)
   const [currentUserId, setCurrentUserId] = useState<number | null>(null)
 
@@ -44,17 +46,9 @@ export function SidebarDesktop({
 
   const handleEdit = async (id: number, newName: string) => {
     try {
-      const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        client: localStorage.getItem('client'),
-        uid: localStorage.getItem('uid'),
-      }
-
-      await axios.put(
-        `http://127.0.0.1:3001/api/v1/calendars/${id}`,
-        { calendar: { name: newName } },
-        { headers },
-      )
+      await api.put(`/api/v1/calendars/${id}`, {
+        calendar: { name: newName },
+      })
 
       setLocalCalendars((prevCalendars) =>
         prevCalendars.map((cal) =>
@@ -68,15 +62,7 @@ export function SidebarDesktop({
 
   const handleDelete = async (id: number) => {
     try {
-      const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        client: localStorage.getItem('client'),
-        uid: localStorage.getItem('uid'),
-      }
-
-      await axios.delete(`http://127.0.0.1:3001/api/v1/calendars/${id}`, {
-        headers,
-      })
+      await api.delete(`/api/v1/calendars/${id}`)
 
       setLocalCalendars((prevCalendars) => {
         const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
@@ -96,15 +82,7 @@ export function SidebarDesktop({
 
   const handleLeave = async (id: number) => {
     try {
-      const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        client: localStorage.getItem('client'),
-        uid: localStorage.getItem('uid'),
-      }
-
-      await axios.delete(`http://127.0.0.1:3001/api/v1/calendars/${id}/leave`, {
-        headers,
-      })
+      await api.delete(`/api/v1/calendars/${id}/leave`)
 
       setLocalCalendars((prevCalendars) => {
         const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
@@ -130,29 +108,24 @@ export function SidebarDesktop({
         </h3>
         <div className="mt-5">
           <div className="flex flex-col gap-1 w-full">
-            {localCalendars?.map(
-              (calendar) => (
-                console.log(calendar.creator_id),
-                (
-                  <SidebarButton
-                    key={calendar.id}
-                    onClick={() => handleCalendarSelect(calendar.id)}
-                    onEdit={(newName) => handleEdit(calendar.id, newName)}
-                    onDelete={() => handleDelete(calendar.id)}
-                    onLeave={() => handleLeave(calendar.id)}
-                    isCreator={calendar.creator_id === currentUserId}
-                    variant={
-                      pathname.startsWith(`/calendars/${calendar.id}`)
-                        ? 'secondary'
-                        : 'ghost'
-                    }
-                    className="w-full"
-                  >
-                    {calendar.name}
-                  </SidebarButton>
-                )
-              ),
-            )}
+            {localCalendars?.map((calendar) => (
+              <SidebarButton
+                key={calendar.id}
+                onClick={() => handleCalendarSelect(calendar.id)}
+                onEdit={(newName) => handleEdit(calendar.id, newName)}
+                onDelete={() => handleDelete(calendar.id)}
+                onLeave={() => handleLeave(calendar.id)}
+                isCreator={calendar.creator_id === currentUserId}
+                variant={
+                  pathname.startsWith(`/calendars/${calendar.id}`)
+                    ? 'secondary'
+                    : 'ghost'
+                }
+                className="w-full"
+              >
+                {calendar.name}
+              </SidebarButton>
+            ))}
             {sidebarItems.extras}
           </div>
         </div>

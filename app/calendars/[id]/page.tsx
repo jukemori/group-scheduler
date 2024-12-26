@@ -1,5 +1,4 @@
 'use client'
-import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
 import {
   Agenda,
   Day,
@@ -15,32 +14,30 @@ import {
 } from '@syncfusion/ej2-react-schedule'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { useSchedule } from '@/contexts/ScheduleContext'
+import api from '@/lib/api'
+import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
+
 export default function Dashboard() {
   const [dataManager, setDataManager] = useState<DataManager>()
   const [ownerData, setOwnerData] = useState([])
   const router = useRouter()
   const params = useParams()
   const { scheduleRef } = useSchedule()
+  const { data: session, status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push('/login')
+    },
+  })
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access-token')
-    const client = localStorage.getItem('client')
-    const uid = localStorage.getItem('uid')
+    if (status === 'loading') return
 
     const fetchUsers = async () => {
       try {
-        const response = await fetch(
-          `http://127.0.0.1:3001/api/v1/calendars/${params.id}/users`,
-          {
-            headers: {
-              'access-token': localStorage.getItem('access-token') || '',
-              client: localStorage.getItem('client') || '',
-              uid: localStorage.getItem('uid') || '',
-            },
-          },
-        )
-        const data = await response.json()
+        const { data } = await api.get(`/api/v1/calendars/${params.id}/users`)
         setOwnerData(data)
       } catch (error) {
         console.error('Error fetching users:', error)
@@ -50,29 +47,25 @@ export default function Dashboard() {
     const initializeDataManager = () => {
       setDataManager(
         new DataManager({
-          url: 'http://127.0.0.1:3001/api/v1/events',
-          crudUrl: 'http://127.0.0.1:3001/api/v1/events',
+          url: `http://127.0.0.1:3001/api/v1/events`,
+          crudUrl: `http://127.0.0.1:3001/api/v1/events`,
           adaptor: new UrlAdaptor(),
           crossDomain: true,
           headers: [
-            { 'access-token': localStorage.getItem('access-token') || '' },
-            { client: localStorage.getItem('client') || '' },
-            { uid: localStorage.getItem('uid') || '' },
+            { 'access-token': session?.accessToken || '' },
+            { client: session?.client || '' },
+            { uid: session?.uid || '' },
             { 'calendar-id': localStorage.getItem('calendar-id') || '' },
           ],
         }),
       )
     }
 
-    if (!(accessToken && client && uid)) {
-      router.push('/login')
-    } else {
-      fetchUsers()
-      setTimeout(() => {
-        initializeDataManager()
-      }, 100)
-    }
-  }, [router, params.id])
+    fetchUsers()
+    setTimeout(() => {
+      initializeDataManager()
+    }, 100)
+  }, [params.id, session, status])
 
   const eventSettings: EventSettingsModel = { dataSource: dataManager }
 

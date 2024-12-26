@@ -1,36 +1,19 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
+import { calendarApi } from '@/lib/api/calendars'
 
 export default function NewCalendar() {
   const [newCalendar, setNewCalendar] = useState({ name: '', description: '' })
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  const getAuthHeaders = () => {
-    const accessToken = localStorage.getItem('access-token')
-    const client = localStorage.getItem('client')
-    const uid = localStorage.getItem('uid')
-
-    return {
-      'access-token': accessToken,
-      client,
-      uid,
-    }
-  }
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:3001/api/v1/calendars',
-        { calendar: newCalendar },
-        { headers: getAuthHeaders() },
-      )
-      localStorage.setItem('calendar-id', response.data.id.toString())
-
-      router.push(`/calendars/${response.data.id}`)
+      const response = await calendarApi.createCalendar(newCalendar.name)
+      localStorage.setItem('calendar-id', response.id.toString())
+      router.push(`/calendars/${response.id}`)
     } catch (err) {
       setError('Failed to create calendar')
     }

@@ -1,22 +1,21 @@
 'use client'
 import NotesList from '@/components/NotesList'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 
 export default function NotesPage() {
   const router = useRouter()
   const params = useParams()
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem('access-token')
-    const client = localStorage.getItem('client')
-    const uid = localStorage.getItem('uid')
-
-    if (!(accessToken && client && uid)) {
+  const { status } = useSession({
+    required: true,
+    onUnauthenticated() {
       router.push('/login')
-      return
-    }
-  }, [router])
+    },
+  })
+
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-4">

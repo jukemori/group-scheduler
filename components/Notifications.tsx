@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useSession } from 'next-auth/react'
+import { notificationsApi } from '@/lib/api/notifications'
 
 interface Notification {
   id: number
@@ -29,6 +31,7 @@ interface Notification {
 }
 
 export default function Notifications() {
+  const { data: session } = useSession()
   const router = useRouter()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isConnected, setIsConnected] = useState(false)
@@ -37,17 +40,7 @@ export default function Notifications() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3001/api/v1/users/notifications`,
-          {
-            headers: {
-              'access-token': localStorage.getItem('access-token') || '',
-              client: localStorage.getItem('client') || '',
-              uid: localStorage.getItem('uid') || '',
-            },
-          },
-        )
-        const data = await response.json()
+        const { data } = await notificationsApi.getNotifications()
         const filteredNotifications = Array(data)
           ? data.filter(
               (notification: Notification) =>
@@ -100,7 +93,7 @@ export default function Notifications() {
       webSocketService.removeConnectionStatusCallback(handleConnectionStatus)
       webSocketService.disconnect()
     }
-  }, [])
+  }, [session])
 
   const formatDate = (dateString: string | Date) => {
     try {
@@ -136,17 +129,7 @@ export default function Notifications() {
 
   const handleAcceptInvitation = async (calendarId: string) => {
     try {
-      await fetch(
-        `http://localhost:3001/api/v1/calendars/${calendarId}/accept_invitation`,
-        {
-          method: 'POST',
-          headers: {
-            'access-token': localStorage.getItem('access-token') || '',
-            client: localStorage.getItem('client') || '',
-            uid: localStorage.getItem('uid') || '',
-          },
-        },
-      )
+      await notificationsApi.acceptInvitation(calendarId)
 
       const updatedNotifications = notifications.filter(
         (n) =>
@@ -168,17 +151,7 @@ export default function Notifications() {
 
   const handleRejectInvitation = async (calendarId: string) => {
     try {
-      await fetch(
-        `http://localhost:3001/api/v1/calendars/${calendarId}/reject_invitation`,
-        {
-          method: 'POST',
-          headers: {
-            'access-token': localStorage.getItem('access-token') || '',
-            client: localStorage.getItem('client') || '',
-            uid: localStorage.getItem('uid') || '',
-          },
-        },
-      )
+      await notificationsApi.rejectInvitation(calendarId)
 
       const updatedNotifications = notifications.filter(
         (n) =>

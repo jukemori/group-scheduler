@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/react'
 type NotificationCallback = (notification: any) => void
 
 export class WebSocketService {
@@ -9,18 +10,23 @@ export class WebSocketService {
   private reconnectTimeout: NodeJS.Timeout | null = null
   private processedActionIds = new Set<string>()
 
-  connect() {
+  async connect() {
     if (this.socket) {
       this.disconnect()
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        const accessToken = encodeURIComponent(
-          localStorage.getItem('access-token') || '',
-        )
-        const client = encodeURIComponent(localStorage.getItem('client') || '')
-        const uid = encodeURIComponent(localStorage.getItem('uid') || '')
+        const session = await getSession()
+
+        if (!session?.accessToken || !session?.client || !session?.uid) {
+          console.error('Missing authentication credentials')
+          return
+        }
+
+        const accessToken = encodeURIComponent(session.accessToken)
+        const client = encodeURIComponent(session.client)
+        const uid = encodeURIComponent(session.uid)
 
         const wsUrl = `ws://localhost:3001/cable?access-token=${accessToken}&client=${client}&uid=${uid}`
         this.socket = new WebSocket(wsUrl)

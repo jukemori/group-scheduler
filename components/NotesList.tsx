@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { useSession } from 'next-auth/react'
+import api from '@/lib/api'
 
 interface Note {
   id: number
@@ -27,43 +29,27 @@ interface Note {
 }
 
 export default function NotesList({ calendarId }: { calendarId: string }) {
+  const { data: session } = useSession()
   const [calendarTitle, setCalendarTitle] = useState('')
   const [notes, setNotes] = useState<Note[]>([])
   const [newNote, setNewNote] = useState('')
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null)
   const [editingContent, setEditingContent] = useState('')
 
-  const getAuthHeaders = () => {
-    return {
-      'access-token': localStorage.getItem('access-token') || '',
-      client: localStorage.getItem('client') || '',
-      uid: localStorage.getItem('uid') || '',
-    }
-  }
   const fetchCalendarDetails = useCallback(async () => {
+    if (!session) return
     try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}`,
-        {
-          headers: getAuthHeaders(),
-        },
-      )
-      const data = await response.json()
+      const { data } = await api.get(`/api/v1/calendars/${calendarId}`)
       setCalendarTitle(data.name)
     } catch (error) {
       console.error('Error fetching calendar details:', error)
     }
-  }, [calendarId])
+  }, [calendarId, session])
 
   const fetchNotes = useCallback(async () => {
+    if (!session) return
     try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes`,
-        {
-          headers: getAuthHeaders(),
-        },
-      )
-      const data = await response.json()
+      const { data } = await api.get(`/api/v1/calendars/${calendarId}/notes`)
       const sortedNotes = Array.isArray(data)
         ? data.sort(
             (a, b) =>
@@ -76,22 +62,15 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
       console.error('Error fetching notes:', error)
       setNotes([])
     }
-  }, [calendarId])
+  }, [calendarId, session])
 
   const createNote = async () => {
+    if (!session) return
     try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes`,
-        {
-          method: 'POST',
-          headers: {
-            ...getAuthHeaders(),
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ calendar_note: { content: newNote } }),
-        },
-      )
-      if (response.ok) {
+      const response = await api.post(`/api/v1/calendars/${calendarId}/notes`, {
+        calendar_note: { content: newNote },
+      })
+      if (response.status === 201 || response.status === 200) {
         setNewNote('')
         fetchNotes()
       }
@@ -102,13 +81,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
 
   const deleteNote = async (noteId: number) => {
     try {
-      await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes/${noteId}`,
-        {
-          method: 'DELETE',
-          headers: getAuthHeaders(),
-        },
-      )
+      await api.delete(`/api/v1/calendars/${calendarId}/notes/${noteId}`)
       fetchNotes()
     } catch (error) {
       console.error('Error deleting note:', error)
@@ -117,18 +90,13 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
 
   const updateNote = async (noteId: number) => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/notes/${noteId}`,
+      const response = await api.put(
+        `/api/v1/calendars/${calendarId}/notes/${noteId}`,
         {
-          method: 'PUT',
-          headers: {
-            ...getAuthHeaders(),
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ calendar_note: { content: editingContent } }),
+          calendar_note: { content: editingContent },
         },
       )
-      if (response.ok) {
+      if (response.status === 200 || response.status === 204) {
         setEditingNoteId(null)
         setEditingContent('')
         fetchNotes()

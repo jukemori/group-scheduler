@@ -15,7 +15,6 @@ export default function Navbar({ calendarId }: NavProps) {
   const pathname = usePathname()
   const { scheduleRef } = useSchedule()
   const isDashboardPage = pathname === `/calendars/${calendarId}`
-  const { user, loading } = useCurrentUser()
 
   const eventButton = () => {
     if (!isDashboardPage) {

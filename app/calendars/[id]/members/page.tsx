@@ -1,7 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import axios from 'axios'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -13,6 +12,8 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card'
+import api from '@/lib/api'
+import { useSession } from 'next-auth/react'
 
 export default function MembersPage() {
   const [inviteEmail, setInviteEmail] = useState('')
@@ -22,44 +23,27 @@ export default function MembersPage() {
   const [calendarTitle, setCalendarTitle] = useState('')
   const params = useParams()
   const calendarId = params.id as string
-
-  const getAuthHeaders = () => {
-    return {
-      'access-token': localStorage.getItem('access-token') || '',
-      client: localStorage.getItem('client') || '',
-      uid: localStorage.getItem('uid') || '',
-    }
-  }
+  const { data: session } = useSession()
 
   const fetchMembers = useCallback(async () => {
+    if (!session) return
     try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/users`,
-        {
-          headers: getAuthHeaders(),
-        },
-      )
-      const data = await response.json()
+      const { data } = await api.get(`/api/v1/calendars/${calendarId}/users`)
       setMembers(data)
     } catch (error) {
       console.error('Error fetching members:', error)
     }
-  }, [calendarId])
+  }, [calendarId, session])
 
   const fetchCalendarDetails = useCallback(async () => {
+    if (!session) return
     try {
-      const response = await fetch(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}`,
-        {
-          headers: getAuthHeaders(),
-        },
-      )
-      const data = await response.json()
+      const { data } = await api.get(`/api/v1/calendars/${calendarId}`)
       setCalendarTitle(data.name)
     } catch (error) {
       console.error('Error fetching calendar details:', error)
     }
-  }, [calendarId])
+  }, [calendarId, session])
 
   useEffect(() => {
     fetchMembers()
@@ -72,17 +56,16 @@ export default function MembersPage() {
     setSuccess('')
 
     try {
-      await axios.post(
-        `http://127.0.0.1:3001/api/v1/calendars/${calendarId}/invite`,
-        { calendar: { email: inviteEmail } },
-        { headers: getAuthHeaders() },
-      )
+      await api.post(`/api/v1/calendars/${calendarId}/invite`, {
+        calendar: { email: inviteEmail },
+      })
       setSuccess('Invitation sent successfully')
       setInviteEmail('')
     } catch (error) {
       setError('Failed to send invitation')
     }
   }
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="mb-8">

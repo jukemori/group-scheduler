@@ -12,18 +12,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import { Input } from '@/components/ui/input'
 import { useMediaQuery } from 'usehooks-ts'
 import { SidebarMobile } from './SidebarMobile'
-
-interface Calendar {
-  id: number
-  name: string
-}
+import { useSession } from 'next-auth/react'
+import { calendarApi } from '@/lib/api/calendars'
+import { Calendar } from '@/lib/api/calendars'
 
 export function Sidebar() {
   const [calendars, setCalendars] = useState<Calendar[]>([])
@@ -32,32 +28,39 @@ export function Sidebar() {
   const isDesktop = useMediaQuery('(min-width: 640px)', {
     initializeWithValue: false,
   })
+  const { data: session, status } = useSession()
 
   const handleCreateCalendar = async (calendarName: string) => {
-    const accessToken = localStorage.getItem('access-token')
-    const client = localStorage.getItem('client')
-    const uid = localStorage.getItem('uid')
-
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:3001/api/v1/calendars',
-        { name: calendarName },
-        {
-          headers: {
-            'access-token': accessToken,
-            client,
-            uid,
-          },
-        },
-      )
-      setCalendars((prevCalendars) => [...prevCalendars, response.data])
+      const newCalendar = await calendarApi.createCalendar(calendarName)
+      setCalendars((prevCalendars) => [...prevCalendars, newCalendar])
+      setNewCalendarName('')
     } catch (error) {
       console.error('Failed to create calendar:', error)
     }
   }
 
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      if (status !== 'authenticated') return
+
+      try {
+        const fetchedCalendars = await calendarApi.getCalendars()
+        setCalendars(fetchedCalendars)
+      } catch (error) {
+        console.error('Failed to fetch calendars:', error)
+      }
+    }
+
+    fetchCalendars()
+  }, [status])
+
   const sidebarItems: SidebarItems = {
-    calendars: [],
+    calendars: calendars.map((calendar) => ({
+      id: calendar.id,
+      name: calendar.name,
+      href: `/calendars/${calendar.id}`,
+    })),
     extras: (
       <div className="mt-6">
         <Dialog>
@@ -97,35 +100,9 @@ export function Sidebar() {
     ),
   }
 
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      const accessToken = localStorage.getItem('access-token')
-      const client = localStorage.getItem('client')
-      const uid = localStorage.getItem('uid')
-
-      try {
-        const response = await axios.get(
-          'http://127.0.0.1:3001/api/v1/calendars',
-          {
-            headers: {
-              'access-token': accessToken,
-              client,
-              uid,
-            },
-          },
-        )
-        setCalendars(response.data)
-      } catch (error) {
-        console.error('Failed to fetch calendars:', error)
-      }
-    }
-
-    fetchCalendars()
-  }, [pathname])
-
-  if (isDesktop) {
-    return <SidebarDesktop sidebarItems={sidebarItems} calendars={calendars} />
-  } else {
-    return <SidebarMobile sidebarItems={sidebarItems} calendars={calendars} />
-  }
+  return isDesktop ? (
+    <SidebarDesktop sidebarItems={sidebarItems} calendars={calendars} />
+  ) : (
+    <SidebarMobile sidebarItems={sidebarItems} calendars={calendars} />
+  )
 }
