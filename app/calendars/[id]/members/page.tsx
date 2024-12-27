@@ -122,7 +122,9 @@ export default function MembersPage() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button type="submit">Send Invitation</Button>
+            <Button type="submit" className="bg-indigo-600">
+              Send Invitation
+            </Button>
           </CardFooter>
         </form>
       </Card>

@@ -73,16 +73,16 @@ export default function Navbar({ calendarId }: NavProps) {
   ]
 
   return (
-    <nav className="fixed top-0 w-full bg-gray-800 text-white z-50">
+    <nav className="fixed top-0 w-full z-50 border-b border-gray-200 bg-white">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white md:self-auto flex-1 text-center md:text-left md:flex-none">
+        <span className="self-center text-2xl font-semibold whitespace-nowrap text-indigo-600 md:self-auto flex-1 text-center md:text-left md:flex-none">
           MingleTime
         </span>
         <div className="hidden md:flex  md:order-2 items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
           <NavUser calendarId={calendarId} />
         </div>
         <div
-          className="fixed md:relative bottom-0 left-0 right-0 md:bottom-auto w-full bg-gray-800 md:bg-transparent items-center justify-between md:flex md:w-auto md:order-1"
+          className="fixed border-t border-gray-200 md:border-none md:relative bottom-0 left-0 right-0 md:bottom-auto w-full  items-center justify-between md:flex md:w-auto md:order-1 bg-white"
           id="navbar-user"
         >
           <ul className="flex flex-row justify-around font-medium p-4 md:p-0 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0">
@@ -92,25 +92,21 @@ export default function Navbar({ calendarId }: NavProps) {
                   <button
                     id="btn1"
                     onClick={eventCreate}
-                    className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${
-                      isActive
-                        ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
-                        : 'text-white'
+                    className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:indigo-600 md:p-0 ${
+                      isActive ? ' text-indigo-600 font-bold' : ''
                     }`}
                   >
-                    <Icon />
+                    <Icon strokeWidth={isActive ? 2.5 : 2} />
                   </button>
                 ) : (
                   <Link
                     href={href}
-                    className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0  ${
-                      isActive
-                        ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
-                        : 'text-white'
+                    className={`block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:indigo-600 md:p-0  ${
+                      isActive ? ' text-indigo-600 font-bold' : ''
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    <Icon />
+                    <Icon strokeWidth={isActive ? 2.5 : 2} />
                   </Link>
                 )}
               </li>

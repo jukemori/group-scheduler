@@ -379,7 +379,9 @@ export default function EditUserPage() {
         </div>
 
         <div className="pt-8 flex justify-end">
-          <Button type="submit">Update Profile</Button>
+          <Button type="submit" className="bg-indigo-600">
+            Update Profile
+          </Button>
         </div>
       </form>
     </div>

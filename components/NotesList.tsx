@@ -117,7 +117,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         <h2 className="text-lg font-bold">{calendarTitle} Notes</h2>
         <Dialog>
           <DialogTrigger asChild>
-            <Button>Create</Button>
+            <Button className="bg-indigo-600">Create</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
