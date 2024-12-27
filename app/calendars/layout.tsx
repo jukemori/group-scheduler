@@ -22,14 +22,14 @@ export default function CalendarLayout({
 
   return (
     <ScheduleContext.Provider value={{ scheduleRef }}>
-      <div className="min-h-screen">
+      <div>
         {pathname.startsWith('/calendars/') && (
           <Navbar calendarId={calendarId} />
         )}
 
-        <div className="flex max-w-screen-xl mx-auto w-full relative">
+        <div className="flex max-w-screen-xl mx-auto mt-16 pt-4 w-full relative">
           <Sidebar />
-          <main className="flex-1 p-4">
+          <main className="ml-0 md:ml-[270px] p-4 flex-1">
             <div>{children}</div>
           </main>
         </div>
