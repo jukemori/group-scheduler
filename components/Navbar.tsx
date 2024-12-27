@@ -3,7 +3,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Bell, CirclePlus, Home, NotepadText, Users } from 'lucide-react'
 import { useSchedule } from '@/contexts/ScheduleContext'
 import { useEffect } from 'react'
-import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { NavUser } from './NavUser'
 
 interface NavProps {
@@ -76,19 +75,9 @@ export default function Navbar({ calendarId }: NavProps) {
   return (
     <nav className="bg-gray-800 text-white">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a
-          href="https://flowbite.com/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          {/* <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8"
-            alt="Flowbite Logo"
-          /> */}
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            MingleTime
-          </span>
-        </a>
+        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+          MingleTime
+        </span>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <NavUser calendarId={calendarId} />
         </div>
