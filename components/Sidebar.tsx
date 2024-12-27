@@ -25,7 +25,7 @@ export function Sidebar() {
   const [calendars, setCalendars] = useState<Calendar[]>([])
   const pathname = usePathname()
   const [newCalendarName, setNewCalendarName] = useState('')
-  const isDesktop = useMediaQuery('(min-width: 640px)', {
+  const isDesktop = useMediaQuery('(min-width: 768px)', {
     initializeWithValue: false,
   })
   const { data: session, status } = useSession()
