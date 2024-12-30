@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useSession } from 'next-auth/react'
 import api from '@/lib/api'
+import { NoteSkeleton } from '@/components/loading/NoteSkeleton'
+import { Card } from '@/components/ui/card'
 
 interface Note {
   id: number
@@ -35,6 +37,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
   const [newNote, setNewNote] = useState('')
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null)
   const [editingContent, setEditingContent] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   const fetchCalendarDetails = useCallback(async () => {
     if (!session) return
@@ -48,6 +51,7 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
 
   const fetchNotes = useCallback(async () => {
     if (!session) return
+    setIsLoading(true)
     try {
       const { data } = await api.get(`/api/v1/calendars/${calendarId}/notes`)
       const sortedNotes = Array.isArray(data)
@@ -61,6 +65,8 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
     } catch (error) {
       console.error('Error fetching notes:', error)
       setNotes([])
+    } finally {
+      setIsLoading(false)
     }
   }, [calendarId, session])
 
@@ -144,7 +150,9 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
         </Dialog>
       </div>
       <div className="space-y-4">
-        {Array.isArray(notes) &&
+        {isLoading ? (
+          [...Array(3)].map((_, index) => <NoteSkeleton key={index} />)
+        ) : Array.isArray(notes) && notes.length > 0 ? (
           notes.map((note) => (
             <Note
               key={note.id}
@@ -156,7 +164,12 @@ export default function NotesList({ calendarId }: { calendarId: string }) {
               updateNote={updateNote}
               deleteNote={deleteNote}
             />
-          ))}
+          ))
+        ) : (
+          <Card className="p-4 text-center text-muted-foreground">
+            No notes yet
+          </Card>
+        )}
       </div>
     </div>
   )
