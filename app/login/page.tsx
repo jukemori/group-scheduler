@@ -4,6 +4,8 @@ import { getSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { calendarApi } from '@/lib/api/calendars'
 import Link from 'next/link'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -64,12 +66,10 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Login to your account
-          </h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold">Login</h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -77,27 +77,27 @@ export default function Login() {
               <label htmlFor="email" className="sr-only">
                 Email address
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
+                className="bg-card"
               />
             </div>
-            <div>
+            <div className="pt-2">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="bg-card"
                 placeholder="Password"
               />
             </div>
@@ -119,10 +119,10 @@ export default function Login() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-muted-foreground" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
+              <span className="px-2 bg-background text-muted-foreground">
                 Or continue with
               </span>
             </div>
@@ -171,11 +171,16 @@ export default function Login() {
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">Don't have an account?</p>
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?
+            </p>
             <Link href="/signup">
-              <button className="mt-2 w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <Button
+                className="mt-2 w-full inline-flex justify-center py-2 px-4 border border-muted-foreground rounded-md shadow-sm bg-card text-sm font-medium text-muted-foreground"
+                variant="secondary"
+              >
                 Sign up
-              </button>
+              </Button>
             </Link>
           </div>
         </div>
