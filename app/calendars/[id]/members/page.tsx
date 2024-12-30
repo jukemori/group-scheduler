@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card'
 import api from '@/lib/api'
 import { useSession } from 'next-auth/react'
+import { MemberSkeleton } from '@/components/loading/MemberSkeleton'
 
 export default function MembersPage() {
   const [inviteEmail, setInviteEmail] = useState('')
@@ -24,14 +25,18 @@ export default function MembersPage() {
   const params = useParams()
   const calendarId = params.id as string
   const { data: session } = useSession()
+  const [isLoading, setIsLoading] = useState(true)
 
   const fetchMembers = useCallback(async () => {
     if (!session) return
+    setIsLoading(true)
     try {
       const { data } = await api.get(`/api/v1/calendars/${calendarId}/users`)
       setMembers(data)
     } catch (error) {
       console.error('Error fetching members:', error)
+    } finally {
+      setIsLoading(false)
     }
   }, [calendarId, session])
 
@@ -71,17 +76,26 @@ export default function MembersPage() {
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-4">Current Members</h2>
         <ul className="flex flex-wrap gap-4">
-          {members.map((member: any) => (
-            <li key={member.Id} className="flex flex-col items-center gap-2">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={member.OwnerPhotoUrl} />
-                <AvatarFallback style={{ backgroundColor: member.OwnerColor }}>
-                  {member.OwnerText.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm">{member.OwnerText}</span>
-            </li>
-          ))}
+          {isLoading
+            ? [...Array(3)].map((_, index) => <MemberSkeleton key={index} />)
+            : members.map((member: any) => (
+                <li
+                  key={member.Id}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={member.OwnerPhotoUrl} />
+                    {!member.OwnerPhotoUrl && (
+                      <AvatarFallback
+                        style={{ backgroundColor: member.OwnerColor }}
+                      >
+                        {member.OwnerText.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <span className="text-sm">{member.OwnerText}</span>
+                </li>
+              ))}
         </ul>
       </div>
 
