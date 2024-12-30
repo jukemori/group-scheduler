@@ -50,14 +50,8 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const calendars = await calendarApi.getCalendars()
-      const redirectUrl =
-        calendars && calendars.length > 0
-          ? `/calendars/${calendars[0].id}`
-          : '/calendars/new'
-
       await signIn('google', {
-        callbackUrl: redirectUrl,
+        callbackUrl: '/auth/callback',
       })
     } catch (error) {
       console.error('Google sign in error:', error)
