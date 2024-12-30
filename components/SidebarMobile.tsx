@@ -1,12 +1,20 @@
 'use client'
 import { Calendar, SidebarItems } from '../types/sidebar'
-import { Sheet, SheetContent, SheetHeader, SheetTrigger } from './ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+  SheetClose,
+} from './ui/sheet'
 import { Button } from './ui/button'
 import { Menu } from 'lucide-react'
 import { SidebarButtonSheet as SidebarButton } from './SidebarButton'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { useSession } from 'next-auth/react'
+import api from '@/lib/api'
+import { NavUser } from '@/components/NavUser'
 import { userApi } from '@/lib/api/users'
 
 interface SidebarMobileProps {
@@ -19,6 +27,7 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
   const router = useRouter()
   const [localCalendars, setLocalCalendars] = useState<Calendar[]>(calendars)
   const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+  const { data: session } = useSession()
 
   useEffect(() => {
     setLocalCalendars(calendars)
@@ -44,17 +53,9 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
 
   const handleEdit = async (id: number, newName: string) => {
     try {
-      const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        client: localStorage.getItem('client'),
-        uid: localStorage.getItem('uid'),
-      }
-
-      await axios.put(
-        `http://127.0.0.1:3001/api/v1/calendars/${id}`,
-        { calendar: { name: newName } },
-        { headers },
-      )
+      await api.put(`/api/v1/calendars/${id}`, {
+        calendar: { name: newName },
+      })
 
       setLocalCalendars((prevCalendars) =>
         prevCalendars.map((cal) =>
@@ -68,15 +69,7 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
 
   const handleDelete = async (id: number) => {
     try {
-      const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        client: localStorage.getItem('client'),
-        uid: localStorage.getItem('uid'),
-      }
-
-      await axios.delete(`http://127.0.0.1:3001/api/v1/calendars/${id}`, {
-        headers,
-      })
+      await api.delete(`/api/v1/calendars/${id}`)
 
       setLocalCalendars((prevCalendars) => {
         const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
@@ -96,15 +89,7 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
 
   const handleLeave = async (id: number) => {
     try {
-      const headers = {
-        'access-token': localStorage.getItem('access-token'),
-        client: localStorage.getItem('client'),
-        uid: localStorage.getItem('uid'),
-      }
-
-      await axios.delete(`http://127.0.0.1:3001/api/v1/calendars/${id}/leave`, {
-        headers,
-      })
+      await api.delete(`/api/v1/calendars/${id}/leave`)
 
       setLocalCalendars((prevCalendars) => {
         const updatedCalendars = prevCalendars.filter((cal) => cal.id !== id)
@@ -129,35 +114,39 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
           <Menu size={20} />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="px-3 py-4">
+      <SheetContent side="left" className="px-3 py-4 bg-card">
         <SheetHeader className="flex flex-row justify-between items-center space-y-0">
           <span className="text-lg font-semibold text-foreground mx-3">
             Calendars
           </span>
         </SheetHeader>
-        <div className="h-full">
+        <div className="h-full flex flex-col">
           <div className="mt-5 flex flex-col w-full gap-1">
             {localCalendars?.map((calendar) => (
-              <SidebarButton
-                key={calendar.id}
-                onClick={() => handleCalendarSelect(calendar.id)}
-                onEdit={(newName) => handleEdit(calendar.id, newName)}
-                onDelete={() => handleDelete(calendar.id)}
-                onLeave={() => handleLeave(calendar.id)}
-                isCreator={calendar.creator_id === currentUserId}
-                variant={
-                  pathname.startsWith(`/calendars/${calendar.id}`)
-                    ? 'secondary'
-                    : 'ghost'
-                }
-                className="w-full"
-              >
-                {calendar.name}
-              </SidebarButton>
+              <SheetClose asChild>
+                <SidebarButton
+                  key={calendar.id}
+                  onClick={() => handleCalendarSelect(calendar.id)}
+                  onEdit={(newName) => handleEdit(calendar.id, newName)}
+                  onDelete={() => handleDelete(calendar.id)}
+                  onLeave={() => handleLeave(calendar.id)}
+                  isCreator={calendar.creator_id === currentUserId}
+                  variant={
+                    pathname.startsWith(`/calendars/${calendar.id}`)
+                      ? 'secondary'
+                      : 'ghost'
+                  }
+                  className="w-full"
+                >
+                  {calendar.name}
+                </SidebarButton>
+              </SheetClose>
             ))}
             {sidebarItems.extras}
           </div>
-          <div className="absolute w-full bottom-4 px-1 left-0"></div>
+          <div className="mt-auto pb-4">
+            <NavUser calendarId={localStorage.getItem('calendar-id') || ''} />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
