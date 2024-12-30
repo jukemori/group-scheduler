@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useSession } from 'next-auth/react'
 import { notificationsApi } from '@/lib/api/notifications'
+import { NotificationSkeleton } from '@/components/loading/NotificationSkeleton'
 
 interface Notification {
   id: number
@@ -36,11 +37,13 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const notificationsRef = useRef<Notification[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
 
     const fetchNotifications = async () => {
+      setIsLoading(true)
       try {
         const { data } = await notificationsApi.getNotifications()
         const filteredNotifications = Array(data)
@@ -59,6 +62,10 @@ export default function Notifications() {
         if (mounted) {
           setNotifications([])
           notificationsRef.current = []
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
         }
       }
     }
@@ -184,7 +191,13 @@ export default function Notifications() {
 
   return (
     <div className="notifications-container">
-      {notifications.length === 0 ? (
+      {isLoading ? (
+        <div className="notifications-list">
+          {[...Array(3)].map((_, index) => (
+            <NotificationSkeleton key={index} />
+          ))}
+        </div>
+      ) : notifications.length === 0 ? (
         <div className="no-notifications">No notifications</div>
       ) : (
         <div className="notifications-list">
