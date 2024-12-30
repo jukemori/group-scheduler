@@ -98,7 +98,7 @@ export default function Note({
                 <p className="whitespace-pre-wrap">{note.content}</p>
               </CardContent>
               <CardFooter>
-                <span className="text-xs text-background">
+                <span className="text-xs text-muted-foreground">
                   {format(new Date(note.created_at), 'MMMM d, yyyy')}
                 </span>
               </CardFooter>
