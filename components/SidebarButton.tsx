@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
 } from './ui/dropdown-menu'
 import { Input } from './ui/input'
-import { SheetClose } from './ui/sheet'
 import {
   Dialog,
   DialogContent,
@@ -37,6 +36,7 @@ interface SidebarButtonProps extends ButtonProps {
   onDelete?: () => void
   onLeave?: () => void
   isCreator?: boolean
+  bg?: 'background' | 'ghost'
 }
 
 let currentOpenDropdownId: string | null = null
@@ -48,6 +48,7 @@ export function SidebarButton({
   onDelete,
   onLeave,
   isCreator,
+  bg = 'ghost',
   ...props
 }: SidebarButtonProps) {
   const [editedName, setEditedName] = useState(children?.toString() || '')

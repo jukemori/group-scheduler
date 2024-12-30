@@ -85,7 +85,7 @@ export default function MembersPage() {
         </ul>
       </div>
 
-      <Card className="max-w-lg shadow-none bg-gray-50">
+      <Card className="max-w-lg shadow-none bg-card">
         <form onSubmit={handleInvite}>
           <CardHeader>
             <CardTitle>Invite Users to {calendarTitle}</CardTitle>
@@ -115,16 +115,14 @@ export default function MembersPage() {
                 id="email"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                className="flex-1 mb-4 bg-white"
+                className="flex-1 mb-4 bg-gray-50"
                 placeholder="Enter email address"
                 required
               />
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button type="submit" className="bg-indigo-600">
-              Send Invitation
-            </Button>
+            <Button type="submit">Send Invitation</Button>
           </CardFooter>
         </form>
       </Card>

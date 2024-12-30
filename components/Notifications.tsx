@@ -207,7 +207,7 @@ export default function Notifications() {
             return (
               <div
                 key={`${notification.id}-${notification.created_at}`}
-                className="notification-item p-4 mb-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+                className="notification-item p-4 mb-3 bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100"
               >
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8">

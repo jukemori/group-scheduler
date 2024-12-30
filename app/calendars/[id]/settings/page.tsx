@@ -190,6 +190,7 @@ export default function EditUserPage() {
                 />
                 <Button
                   variant="secondary"
+                  className="bg-card"
                   type="button"
                   onClick={() =>
                     document.getElementById('photo-upload')?.click()
@@ -207,7 +208,7 @@ export default function EditUserPage() {
               type="text"
               value={user.name}
               onChange={(e) => setUser({ ...user, name: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-card"
             />
           </div>
 
@@ -217,7 +218,7 @@ export default function EditUserPage() {
               type="text"
               value={user.nickname}
               onChange={(e) => setUser({ ...user, nickname: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-card"
             />
           </div>
 
@@ -227,7 +228,7 @@ export default function EditUserPage() {
               type="email"
               value={user.email}
               onChange={(e) => setUser({ ...user, email: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-card"
             />
           </div>
 
@@ -235,7 +236,7 @@ export default function EditUserPage() {
             <label className="block text-sm font-medium  mb-2">Password</label>
             <Dialog>
               <DialogTrigger asChild>
-                <Button type="button" variant="secondary">
+                <Button type="button" variant="secondary" className="bg-card">
                   Change Password
                 </Button>
               </DialogTrigger>
@@ -322,7 +323,7 @@ export default function EditUserPage() {
                     className="w-12 h-12 rounded-full border-2"
                     style={{ backgroundColor: user.color || '#000000' }}
                   />
-                  <Button variant="secondary" type="button">
+                  <Button variant="secondary" type="button" className="bg-card">
                     Change Color
                   </Button>
                 </div>
@@ -379,9 +380,7 @@ export default function EditUserPage() {
         </div>
 
         <div className="pt-8 flex justify-end">
-          <Button type="submit" className="bg-indigo-600">
-            Update Profile
-          </Button>
+          <Button type="submit">Update Profile</Button>
         </div>
       </form>
     </div>

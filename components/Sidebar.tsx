@@ -65,9 +65,7 @@ export function Sidebar() {
       <div className="mt-6">
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="w-full bg-indigo-600">
-              Create New Calendar
-            </Button>
+            <Button className="w-full">Create New Calendar</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>

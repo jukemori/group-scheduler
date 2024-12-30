@@ -21,7 +21,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog'
-import { useState } from 'react'
 
 interface NoteProps {
   note: {
@@ -92,14 +91,14 @@ export default function Note({
                       {note.user?.nickname?.substring(0, 2) || 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <span>{note.user.nickname}</span>
+                  <span className="font-semibold">{note.user.nickname}</span>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-wrap">{note.content}</p>
               </CardContent>
               <CardFooter>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-background">
                   {format(new Date(note.created_at), 'MMMM d, yyyy')}
                 </span>
               </CardFooter>

@@ -101,7 +101,7 @@ export function SidebarDesktop({
   }
 
   return (
-    <aside className="w-[270px] max-w-xs h-screen z-40 border-r fixed top-16 pt-4">
+    <aside className="w-[270px] max-w-xs h-auto z-40 border fixed top-16 py-2 mt-8 rounded-lg bg-card shadow">
       <div className="h-full px-3 py-4">
         <h3 className="mx-3 text-lg font-semibold text-foreground">
           Calendars
