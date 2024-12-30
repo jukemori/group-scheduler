@@ -3,6 +3,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { Input } from '@/components/ui/input'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -22,13 +23,24 @@ export default function Signup() {
     }
 
     try {
-      await axios.post('http://127.0.0.1:3001/api/v1/auth', {
-        email,
-        password,
-        password_confirmation: passwordConfirmation,
-        name,
-        nickname,
-      })
+      await axios.post(
+        'http://127.0.0.1:3001/api/v1/auth',
+        {
+          email,
+          password,
+          password_confirmation: passwordConfirmation,
+          name,
+          nickname,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          params: {
+            confirm_success_url: `${window.location.origin}/calendars/new`,
+          },
+        },
+      )
 
       const result = await signIn('credentials', {
         email,
@@ -50,83 +62,93 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold">
             Create your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSignup}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="name" className="sr-only">
-                Name
+          <div className="rounded-md shadow-sm space-y-4">
+            <div className="space-y-1">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-foreground"
+              >
+                Full Name
               </label>
-              <input
+              <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Full Name"
+                className="bg-card"
               />
             </div>
-            <div>
-              <label htmlFor="nickname" className="sr-only">
+            <div className="space-y-1">
+              <label
+                htmlFor="nickname"
+                className="block text-sm font-medium text-foreground"
+              >
                 Nickname
               </label>
-              <input
+              <Input
                 id="nickname"
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Nickname"
+                className="bg-card"
               />
             </div>
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
+            <div className="space-y-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-foreground"
+              >
+                Email Address
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                className="bg-card"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
+            <div className="space-y-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-foreground"
+              >
                 Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                className="bg-card"
               />
             </div>
-            <div>
-              <label htmlFor="password-confirmation" className="sr-only">
+            <div className="space-y-1">
+              <label
+                htmlFor="password-confirmation"
+                className="block text-sm font-medium text-foreground"
+              >
                 Confirm Password
               </label>
-              <input
+              <Input
                 id="password-confirmation"
                 type="password"
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm Password"
+                className="bg-card"
               />
             </div>
           </div>
