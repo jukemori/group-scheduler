@@ -6,15 +6,18 @@ import { useState, useEffect } from 'react'
 import { userApi } from '@/lib/api/users'
 import api from '@/lib/api'
 import { useSession } from 'next-auth/react'
+import { SidebarSkeleton } from '@/components/loading/SidebarSkeleton'
 
 interface SidebarDesktopProps {
   sidebarItems: SidebarItems
   calendars: Calendar[]
+  isLoading: boolean
 }
 
 export function SidebarDesktop({
   sidebarItems,
   calendars,
+  isLoading,
 }: SidebarDesktopProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -108,25 +111,31 @@ export function SidebarDesktop({
         </h3>
         <div className="mt-5">
           <div className="flex flex-col gap-1 w-full">
-            {localCalendars?.map((calendar) => (
-              <SidebarButton
-                key={calendar.id}
-                onClick={() => handleCalendarSelect(calendar.id)}
-                onEdit={(newName) => handleEdit(calendar.id, newName)}
-                onDelete={() => handleDelete(calendar.id)}
-                onLeave={() => handleLeave(calendar.id)}
-                isCreator={calendar.creator_id === currentUserId}
-                variant={
-                  pathname.startsWith(`/calendars/${calendar.id}`)
-                    ? 'secondary'
-                    : 'ghost'
-                }
-                className="w-full"
-              >
-                {calendar.name}
-              </SidebarButton>
-            ))}
-            {sidebarItems.extras}
+            {isLoading ? (
+              [...Array(3)].map((_, index) => <SidebarSkeleton key={index} />)
+            ) : (
+              <>
+                {localCalendars?.map((calendar) => (
+                  <SidebarButton
+                    key={calendar.id}
+                    onClick={() => handleCalendarSelect(calendar.id)}
+                    onEdit={(newName) => handleEdit(calendar.id, newName)}
+                    onDelete={() => handleDelete(calendar.id)}
+                    onLeave={() => handleLeave(calendar.id)}
+                    isCreator={calendar.creator_id === currentUserId}
+                    variant={
+                      pathname.startsWith(`/calendars/${calendar.id}`)
+                        ? 'secondary'
+                        : 'ghost'
+                    }
+                    className="w-full"
+                  >
+                    {calendar.name}
+                  </SidebarButton>
+                ))}
+                {sidebarItems.extras}
+              </>
+            )}
           </div>
         </div>
       </div>

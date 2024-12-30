@@ -23,6 +23,7 @@ import { Calendar } from '@/lib/api/calendars'
 
 export function Sidebar() {
   const [calendars, setCalendars] = useState<Calendar[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const pathname = usePathname()
   const [newCalendarName, setNewCalendarName] = useState('')
   const isDesktop = useMediaQuery('(min-width: 768px)', {
@@ -44,11 +45,14 @@ export function Sidebar() {
     const fetchCalendars = async () => {
       if (status !== 'authenticated') return
 
+      setIsLoading(true)
       try {
         const fetchedCalendars = await calendarApi.getCalendars()
         setCalendars(fetchedCalendars)
       } catch (error) {
         console.error('Failed to fetch calendars:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -101,7 +105,11 @@ export function Sidebar() {
   }
 
   return isDesktop ? (
-    <SidebarDesktop sidebarItems={sidebarItems} calendars={calendars} />
+    <SidebarDesktop
+      sidebarItems={sidebarItems}
+      calendars={calendars}
+      isLoading={isLoading}
+    />
   ) : (
     <SidebarMobile sidebarItems={sidebarItems} calendars={calendars} />
   )
