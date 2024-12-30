@@ -175,9 +175,11 @@ export default function EditUserPage() {
               {photoPreview && (
                 <Avatar className="w-12 h-12">
                   <AvatarImage src={photoPreview} />
-                  <AvatarFallback style={{ backgroundColor: user.color }}>
-                    {user.name?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+                  {!photoPreview && (
+                    <AvatarFallback style={{ backgroundColor: user.color }}>
+                      {user.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
               )}
               <div>

@@ -24,6 +24,7 @@ interface Notification {
     nickname: string
     calendar_id: string
     photo_url: string
+    color: string
   }
   event?: {
     id: number
@@ -225,9 +226,13 @@ export default function Notifications() {
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={notification.user.photo_url} />
-                    <AvatarFallback>
-                      {notification.user.nickname.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
+                    {!notification.user.photo_url && (
+                      <AvatarFallback
+                        style={{ backgroundColor: notification.user.color }}
+                      >
+                        {notification.user.nickname?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
 
                   <div className="flex-1">
