@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { SettingsSkeleton } from '@/components/loading/SettingsSkeleton'
 
 export default function EditUserPage() {
   const [user, setUser] = useState<Partial<User>>({
@@ -35,9 +36,11 @@ export default function EditUserPage() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoading(true)
       try {
         const user = await userApi.getCurrentUser()
         setUser(user)
@@ -47,6 +50,8 @@ export default function EditUserPage() {
         }
       } catch (err) {
         setError('Failed to load user data')
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -149,6 +154,10 @@ export default function EditUserPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isLoading) {
+    return <SettingsSkeleton />
   }
 
   return (
