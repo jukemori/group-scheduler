@@ -1,92 +1,45 @@
 'use client'
-import { useState } from 'react'
-import axios from 'axios'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { getSession } from 'next-auth/react'
+import { calendarApi } from '@/lib/api/calendars'
 
-export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+export default function Home() {
   const router = useRouter()
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    try {
-      const response = await axios.post(
-        'http://127.0.0.1:3001/api/v1/auth/sign_in',
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      )
+  useEffect(() => {
+    const checkAuth = async () => {
+      const session = await getSession()
 
-      localStorage.setItem('access-token', response.headers['access-token'])
-      localStorage.setItem('client', response.headers['client'])
-      localStorage.setItem('uid', response.headers['uid'])
-      router.push('/calendars')
-    } catch (err) {
-      setError((err as any).response?.data || 'An error occurred')
+      if (!session?.accessToken) {
+        router.push('/login')
+        return
+      }
+
+      try {
+        const calendars = await calendarApi.getCalendars()
+        if (calendars && calendars.length > 0) {
+          router.push(`/calendars/${calendars[0].id}`)
+        } else {
+          router.push('/calendars/new')
+        }
+      } catch (error) {
+        console.error('Error fetching calendars:', error)
+        router.push('/calendars/new')
+      }
     }
-  }
+
+    checkAuth()
+  }, [router])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Login to your account
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Sign in
-            </button>
-          </div>
-          {error && (
-            <p className="mt-2 text-center text-sm text-red-600">{error}</p>
-          )}
-        </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <h2 className="mt-4 text-xl font-semibold text-gray-700">Loading...</h2>
+        <p className="mt-2 text-sm text-gray-500">
+          Please wait while we redirect you
+        </p>
       </div>
     </div>
   )
