@@ -49,7 +49,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 FACEBOOK_CLIENT_ID=your_facebook_client_id
 FACEBOOK_CLIENT_SECRET=your_facebook_client_secret
 SYNCFUSION_LICENSE=your_syncfusion_license
-
+```
 
 ## Deployment
 
