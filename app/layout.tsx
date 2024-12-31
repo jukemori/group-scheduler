@@ -1,4 +1,3 @@
-import { registerLicense } from '@syncfusion/ej2-base'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -11,9 +10,6 @@ export const metadata: Metadata = {
   description:
     'MingleTime helps you create and share schedules, making it easy to coordinate events and stay organized with friends, family, and teams.',
 }
-
-const licenseKey = process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE || ''
-registerLicense(licenseKey)
 
 export default function RootLayout({
   children,
