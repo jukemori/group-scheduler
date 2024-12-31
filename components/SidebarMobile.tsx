@@ -123,7 +123,7 @@ export function SidebarMobile({ sidebarItems, calendars }: SidebarMobileProps) {
         <div className="h-full flex flex-col">
           <div className="mt-5 flex flex-col w-full gap-1">
             {localCalendars?.map((calendar) => (
-              <SheetClose asChild>
+              <SheetClose asChild key={calendar.id}>
                 <SidebarButton
                   key={calendar.id}
                   onClick={() => handleCalendarSelect(calendar.id)}
