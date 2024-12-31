@@ -71,7 +71,7 @@ const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           const response = await axios.post(
-            'http://127.0.0.1:3001/api/v1/auth/sign_in',
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/sign_in`,
             {
               email: credentials?.email,
               password: credentials?.password,
@@ -95,7 +95,7 @@ const authOptions: NextAuthOptions = {
       if (account?.provider === 'google') {
         try {
           const response = await axios.post(
-            'http://127.0.0.1:3001/api/v1/auth/google_oauth2/callback',
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google_oauth2/callback`,
             {
               omniauth: {
                 provider: 'google',

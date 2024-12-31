@@ -28,7 +28,7 @@ export class WebSocketService {
         const client = encodeURIComponent(session.client)
         const uid = encodeURIComponent(session.uid)
 
-        const wsUrl = `ws://localhost:3001/cable?access-token=${accessToken}&client=${client}&uid=${uid}`
+        const wsUrl = `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace('http', 'ws')}/cable?access-token=${accessToken}&client=${client}&uid=${uid}`
         this.socket = new WebSocket(wsUrl)
 
         this.socket.onopen = () => {

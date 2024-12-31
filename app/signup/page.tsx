@@ -24,7 +24,7 @@ export default function Signup() {
 
     try {
       await axios.post(
-        'http://127.0.0.1:3001/api/v1/auth',
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth`,
         {
           email,
           password,

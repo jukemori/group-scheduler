@@ -47,8 +47,8 @@ export default function Dashboard() {
     const initializeDataManager = () => {
       setDataManager(
         new DataManager({
-          url: `http://127.0.0.1:3001/api/v1/events`,
-          crudUrl: `http://127.0.0.1:3001/api/v1/events`,
+          url: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/events`,
+          crudUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/events`,
           adaptor: new UrlAdaptor(),
           crossDomain: true,
           headers: [
