@@ -21,7 +21,7 @@ export default function CalendarLayout({
   const calendarId = pathname.split('/')[2]
 
   return (
-    <ScheduleContext.Provider value={{ scheduleRef }}>
+    <ScheduleContext.Provider value={{ scheduleRef: scheduleRef as React.RefObject<ScheduleComponent> }}>
       <div>
         {pathname.startsWith('/calendars/') && (
           <Navbar calendarId={calendarId} />

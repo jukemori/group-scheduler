@@ -19,6 +19,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@syncfusion/ej2-react-buttons": "^27.1.48",
     "@syncfusion/ej2-react-schedule": "^27.1.48",
+    "axios": "^1.7.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
+    "@types/react": "19.0.2",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
