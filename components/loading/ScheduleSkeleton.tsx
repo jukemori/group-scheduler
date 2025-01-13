@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function ScheduleSkeleton() {
   return (
-    <div className="w-full h-[550px] border rounded-md bg-white">
+    <div className="w-full h-full p-4 border rounded-md bg-white">
       <div className="border-b p-4">
         <div className="flex justify-between items-center">
           <Skeleton className="h-8 w-32" />
@@ -23,7 +23,7 @@ export function ScheduleSkeleton() {
         {Array(35)
           .fill(0)
           .map((_, i) => (
-            <Skeleton key={`cell-${i}`} className="h-20 w-full" />
+            <Skeleton key={`cell-${i}`} className="h-24 w-full" />
           ))}
       </div>
     </div>
