@@ -111,6 +111,10 @@ export function Sidebar() {
       isLoading={isLoading}
     />
   ) : (
-    <SidebarMobile sidebarItems={sidebarItems} calendars={calendars} />
+    <SidebarMobile
+      sidebarItems={sidebarItems}
+      calendars={calendars}
+      isLoading={isLoading}
+    />
   )
 }
