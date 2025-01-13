@@ -304,6 +304,12 @@ label.e-float-text,
   color: #18181b;
 }
 
+.e-toolbar .e-toolbar-pop,
+.e-toolbar .e-toolbar-pop .e-toolbar-item .e-tbar-btn {
+  background: hsl(var(--card));
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
 /* Google Sign In Button */
 
 .gsi-material-button {
