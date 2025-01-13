@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { User } from '@/lib/api/types'
 import { SheetClose } from '@/components/ui/sheet'
 import { useMediaQuery } from 'usehooks-ts'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function NavUser({ calendarId }: { calendarId: string }) {
   const { data: session, status } = useSession()
@@ -41,9 +42,14 @@ export function NavUser({ calendarId }: { calendarId: string }) {
 
   if (status === 'loading' || !userData) {
     return (
-      <Avatar className="h-8 w-8 rounded-lg">
-        <AvatarFallback className="rounded-lg">...</AvatarFallback>
-      </Avatar>
+      <div className="flex items-center gap-2 px-2 py-1.5">
+        <Skeleton className="h-8 w-8 rounded-lg" />
+        <div className="grid flex-1 gap-1">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+        <Skeleton className="h-4 w-4" />
+      </div>
     )
   }
 
