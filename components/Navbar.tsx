@@ -85,7 +85,7 @@ export default function Navbar({ calendarId }: NavProps) {
           className="fixed border-t border-background md:border-none md:relative bottom-0 left-0 right-0 md:bottom-auto w-full items-center justify-between md:flex md:w-auto md:order-1 bg-card shadow md:shadow-none"
           id="navbar-user"
         >
-          <ul className="flex flex-row justify-around font-medium p-4 md:p-0 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0">
+          <ul className="flex flex-row justify-around font-medium p-2 md:p-0 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0">
             {navItems.map(({ icon: Icon, href, isActive, eventCreate }) => (
               <li key={`${Icon.name}-${href}`}>
                 {eventCreate ? (

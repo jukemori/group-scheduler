@@ -21,13 +21,15 @@ export default function CalendarLayout({
   const calendarId = pathname.split('/')[2]
 
   return (
-    <ScheduleContext.Provider value={{ scheduleRef: scheduleRef as React.RefObject<ScheduleComponent> }}>
+    <ScheduleContext.Provider
+      value={{ scheduleRef: scheduleRef as React.RefObject<ScheduleComponent> }}
+    >
       <div>
         {pathname.startsWith('/calendars/') && (
           <Navbar calendarId={calendarId} />
         )}
 
-        <div className="flex max-w-screen-xl mx-auto mt-16 pt-4 w-full relative">
+        <div className="flex max-w-screen-xl mx-auto mt-12 md:mt-16 pt-4 w-full relative">
           <Sidebar />
           <main className="ml-0 md:ml-[270px] p-4 flex-1">
             <div>{children}</div>
