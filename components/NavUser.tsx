@@ -16,10 +16,13 @@ import { userApi } from '@/lib/api/users'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { User } from '@/lib/api/types'
+import { SheetClose } from '@/components/ui/sheet'
+import { useMediaQuery } from 'usehooks-ts'
 
 export function NavUser({ calendarId }: { calendarId: string }) {
   const { data: session, status } = useSession()
   const [userData, setUserData] = useState<User | null>(null)
+  const isMobile = useMediaQuery('(max-width: 768px)')
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -102,12 +105,23 @@ export function NavUser({ calendarId }: { calendarId: string }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href={`/calendars/${calendarId}/settings`}>
-            <DropdownMenuItem>
-              <Settings />
-              Settings
-            </DropdownMenuItem>
-          </Link>
+          {isMobile ? (
+            <SheetClose asChild>
+              <Link href={`/calendars/${calendarId}/settings`}>
+                <DropdownMenuItem>
+                  <Settings />
+                  Settings
+                </DropdownMenuItem>
+              </Link>
+            </SheetClose>
+          ) : (
+            <Link href={`/calendars/${calendarId}/settings`}>
+              <DropdownMenuItem>
+                <Settings />
+                Settings
+              </DropdownMenuItem>
+            </Link>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
