@@ -18,10 +18,12 @@ import { useSession } from 'next-auth/react'
 import { useSchedule } from '@/contexts/ScheduleContext'
 import api from '@/lib/api'
 import { DataManager, UrlAdaptor } from '@syncfusion/ej2-data'
+import { ScheduleSkeleton } from '@/components/loading/ScheduleSkeleton'
 
 export default function Dashboard() {
   const [dataManager, setDataManager] = useState<DataManager>()
   const [ownerData, setOwnerData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const params = useParams()
   const { scheduleRef } = useSchedule()
@@ -59,13 +61,16 @@ export default function Dashboard() {
           ],
         }),
       )
+      setIsLoading(false)
     }
 
     fetchUsers()
-    setTimeout(() => {
-      initializeDataManager()
-    }, 100)
+    initializeDataManager()
   }, [params.id, session, status])
+
+  if (isLoading || !dataManager || ownerData.length === 0) {
+    return <ScheduleSkeleton />
+  }
 
   const eventSettings: EventSettingsModel = { dataSource: dataManager }
 
