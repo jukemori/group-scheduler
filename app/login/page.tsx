@@ -111,7 +111,7 @@ export default function Login() {
         </form>
 
         <div className="mt-6">
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-muted-foreground" />
             </div>
@@ -162,7 +162,7 @@ export default function Login() {
                 <span style={{ display: 'none' }}>Sign in with Google</span>
               </div>
             </button>
-          </div>
+          </div> */}
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
