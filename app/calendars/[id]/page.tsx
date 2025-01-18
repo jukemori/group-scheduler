@@ -47,6 +47,10 @@ export default function Dashboard() {
     }
 
     const initializeDataManager = () => {
+      if (!localStorage.getItem('calendar-id')) {
+        localStorage.setItem('calendar-id', params.id as string)
+      }
+
       setDataManager(
         new DataManager({
           url: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/events`,
@@ -57,7 +61,7 @@ export default function Dashboard() {
             { 'access-token': session?.accessToken || '' },
             { client: session?.client || '' },
             { uid: session?.uid || '' },
-            { 'calendar-id': localStorage.getItem('calendar-id') || '' },
+            { 'calendar-id': params.id as string },
           ],
         }),
       )

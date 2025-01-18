@@ -12,9 +12,11 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsLoading(true)
     try {
       const result = await signIn('credentials', {
         email,
@@ -30,6 +32,7 @@ export default function Login() {
           try {
             const calendars = await calendarApi.getCalendars()
             if (calendars && calendars.length > 0) {
+              localStorage.setItem('calendar-id', calendars[0].id.toString())
               router.push(`/calendars/${calendars[0].id}`)
             } else {
               router.push('/calendars/new')
@@ -45,6 +48,8 @@ export default function Login() {
     } catch (error) {
       console.error('Login error:', error)
       setError('An error occurred during login')
+    } finally {
+      setIsLoading(false)
     }
   }
 
