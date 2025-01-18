@@ -32,15 +32,19 @@ export default function Navbar({ calendarId }: NavProps) {
 
   useEffect(() => {
     if (isDashboardPage && sessionStorage.getItem('openEventEditor')) {
-      sessionStorage.removeItem('openEventEditor')
-      let cellData = {
-        startTime: new Date(),
-        endTime: new Date(new Date().getTime() + 30 * 60000),
-        subject: 'New Event',
-      }
-      setTimeout(() => {
-        scheduleRef?.current?.openEditor(cellData, 'Add')
-      }, 100)
+      const timer = setTimeout(() => {
+        if (scheduleRef?.current) {
+          let cellData = {
+            startTime: new Date(),
+            endTime: new Date(new Date().getTime() + 30 * 60000),
+            subject: 'New Event',
+          }
+          scheduleRef.current.openEditor(cellData, 'Add')
+          sessionStorage.removeItem('openEventEditor')
+        }
+      }, 500)
+
+      return () => clearTimeout(timer)
     }
   }, [isDashboardPage, scheduleRef])
 
