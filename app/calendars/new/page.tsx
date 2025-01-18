@@ -86,7 +86,7 @@ export default function NewCalendar() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push('/calendars')}
+              onClick={() => router.push('/login')}
               className="group relative w-full flex justify-center py-2 px-4 border border-muted-foreground text-sm font-medium rounded-md bg-card "
             >
               Cancel
