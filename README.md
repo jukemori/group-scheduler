@@ -2,6 +2,27 @@
 
 Scheduling application built with Next.js, enabling efficient group calendar management and event coordination.
 
+## Demo
+
+Check out the live demo [here](https://mingletime.vercel.app/).
+
+### Login Credentials
+
+- **Username:** `michael@example.com`
+- **Password:** `password`
+
+<img src="./public/demo1.png" width="600" alt="Demo 1" />
+
+<img src="./public/demo2.png" width="600" alt="Demo 2" />
+
+<img src="./public/demo3.png" width="600" alt="Demo 3" />
+
+<img src="./public/demo4.png" width="600" alt="Demo 4" />
+
+<img src="./public/demo5.png" width="600" alt="Demo 5" />
+
+<img src="./public/demo6.png" width="600" alt="Demo 6" />
+
 ## Features
 
 - 📅 Interactive calendar interface
@@ -13,7 +34,7 @@ Scheduling application built with Next.js, enabling efficient group calendar man
 ## Tech Stack
 
 - **Framework**: Next.js 14
-- **UI Components**: 
+- **UI Components**:
   - Shadcn/ui
   - Tailwind CSS
 - **Authentication**: NextAuth.js
